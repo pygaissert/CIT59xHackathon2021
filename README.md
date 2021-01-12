@@ -8,14 +8,18 @@
 **Team Members**  Use format below  
 Name | Year
 ------------ | -------------
-<person 1> | <their year>
+Philipp Gaissert | 2022
+Jintong Wu | 2022
+Dana Yang | 2022
 ​
 ​
 **General Idea**  - A general description of what your software will do  
 Enter text here
 ​
 **Anticipated Stack** - What technologies do you anticipate using?  
-Enter text here
+NodeJS
+Bolt for JavaScript (Slack API)
+MongoDB Atlas (Database)
 ​
 **Presentation URL** - At the end of the hackathon, upload your presentation to YouTube/Vimeo (unlisted) and place it here.  
 Enter URL here
