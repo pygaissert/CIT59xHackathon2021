@@ -1,6 +1,6 @@
 // IMPORT THIRD-PARTY MODULES
 require('dotenv').config();
-const localtunnel = require('localtunnel');
+
 
 // IMPORTS VARIABLES FROM .env
 const slackBotToken = process.env.SLACK_BOT_TOKEN;
@@ -65,7 +65,6 @@ app.command('/mongo', async ({ ack, say }) => {
 
 // STARTS THE APP
 (async () => {
-  const tunnel = await localtunnel({port: port, subdomain: "cit-app"});
   await app.start(port);
   console.log('⚡️ Bolt app is running!');
 })();

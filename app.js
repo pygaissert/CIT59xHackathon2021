@@ -10,7 +10,6 @@ const slackSigningSecret = process.env.SLACK_SIGNING_SECRET;
 const port = process.env.PORT || 3000;
 const uri = process.env.MONGODB_CONNECTION;
 
-const localtunnel = require('localtunnel');
 
 // INITIALIZES THE APP
 const { App } = require('@slack/bolt');
@@ -32,7 +31,6 @@ const MongoClient = require('mongodb').MongoClient;
 
 // STARTS THE APP
 (async () => {
-  const tunnel = await localtunnel({port: port, subdomain: "cit-app"});
   await app.start(port);
   console.log('⚡️ Bolt app is running!');
 })();
