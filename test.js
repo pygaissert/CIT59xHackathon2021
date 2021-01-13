@@ -32,6 +32,12 @@ app.message('hello', async ({ message, say }) => {
   await say(`Hey there <@${message.user}>!`);
 });
 
+// TESTS RESPONSE TO 'hello' MESSAGE
+app.message('hi', async ({ message, say }) => {
+  // say() sends a message to the channel where the event was triggered
+  await say(`Hi there <@${message.user}>!`);
+});
+
 
 // TESTS RESPONSE TO '/modal' SLASH COMMAND & CREATING MODAL
 app.command('/modal', async ({ ack, body, client }) => {
