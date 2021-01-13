@@ -20,6 +20,7 @@ The program allows users in the same workspace to find other users with skillset
 NodeJS
 Bolt for JavaScript (Slack API)
 MongoDB Atlas (Database)
+Heroku (NodeJS hosting)
 ​
 **Presentation URL** - At the end of the hackathon, upload your presentation to YouTube/Vimeo (unlisted) and place it here.  
 Enter URL here
