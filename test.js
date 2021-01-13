@@ -155,10 +155,13 @@ app.command('/modal', async ({ ack, body, client }) => {
 // TESTS CONNECTION TO MONGODB CLUSTER (not working right now)
 app.command('/mongo', async ({ ack, say }) => {
   await ack();
-  let client = await new MongoClient(uri, { useUnifiedTopology: true });
+  let client = new MongoClient(uri, { useUnifiedTopology: true });
+  await client.connect();
   try {
-    result = await client.db("app-data").collection("test").findOne({group: "test"});
+    collection = await client.db("app-data").collection("test");
+    result = await collection.findOne({group: "test"});
     await say(result.name);
+    client.close();
   } catch (error) {
     console.error(error);
   }

@@ -18,6 +18,7 @@
   "homepage": "https://github.com/pygaissert/CIT59xHackathon2021#readme",
   "dependencies": {
     "@slack/bolt": "^2.7.0",
+    "@slack/events-api": "^3.0.0",
     "@slack/interactive-messages": "^2.0.0",
     "dotenv": "^8.2.0",
     "localtunnel": "^2.0.1",
