@@ -14,7 +14,7 @@ Dana Yang | 2022
 ​
 ​
 **General Idea**  - A general description of what your software will do  
-Enter text here
+The program allows users in the same workspace to find other users with skillsets that they would like to learn more about or collaborate on a project together. The slackbot intakes basic information and skills from every user and compiles it into a database. When prompted for a certain skill in the database, the slackbot will list all users with the desired skillset and allow the user to message users with those skillsets.
 ​
 **Anticipated Stack** - What technologies do you anticipate using?  
 NodeJS
