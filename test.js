@@ -32,11 +32,21 @@ app.message('hello', async ({ message, say }) => {
   await say(`Hey there <@${message.user}>!`);
 });
 
-// TESTS RESPONSE TO 'hello' MESSAGE
-app.message('hi', async ({ message, say }) => {
-  // say() sends a message to the channel where the event was triggered
-  await say(`Hi there <@${message.user}>!`);
-});
+// MAIN FUNCTION FOR INITIALIZING THE SLACKBOT
+async function main(){
+	try {
+    await app.say(`Hello there! To participate, reply with _yes_.`);
+    await app.message('yes', async ({ message, say }) => {
+      await app.say(`To get started, type command "/modal".`);
+    });
+	} catch (e) {
+    		console.error(e);
+  }
+}
+
+// TEST MAIN FUNCTION
+main().catch(console.error);
+
 
 
 // TESTS RESPONSE TO '/modal' SLASH COMMAND & CREATING MODAL
@@ -50,7 +60,92 @@ app.command('/modal', async ({ ack, body, client }) => {
       // Pass a valid trigger_id within 3 seconds of receiving it
       trigger_id: body.trigger_id,
       // View payload
-      view: views.test
+      view:
+      {
+	       type: "modal",
+	       title: {
+           type: "plain_text",
+		       text: "My App",
+		       emoji: true
+         },
+         submit: {
+           type: "plain_text",
+           text: "Submit",
+           emoji: true
+         },
+         close: {
+           type: "plain_text",
+           text: "Cancel",
+           emoji: true
+         },
+         blocks: [
+           {
+             type: "section",
+             text: {
+               type: "mrkdwn",
+               text: "Welcome to Elicit! To participate, tell us about you!"
+             }
+           },
+           {
+             type: "section",
+             text: {
+               type: "mrkdwn",
+               text: "Academic Status"
+             },
+             accessory: {
+               type: "static_select",
+               placeholder: {
+                 type: "plain_text",
+                 text: "year",
+                 emoji: true
+               },
+               options: [
+                 {
+                   text: {
+                     type: "plain_text",
+                     text: "first year",
+                     emoji: true
+                   },
+                   value: "value-0"
+                 },
+                 {
+                   text: {
+                     type: "plain_text",
+                     text: "second year",
+                     emoji: true
+                   },
+                   value: "value-1"
+                 },
+                 {
+                   text: {
+                     type: "plain_text",
+                     text: "submatriculate",
+                     emoji: true
+                   },
+                   value: "value-2"
+                 },
+                 {
+                   text: {
+                     type: "plain_text",
+                     text: "part-time",
+                     emoji: true
+                   },
+                   value: "value-3"
+                 },
+                 {
+                   text: {
+                     type: "plain_text",
+                     text: "alumni",
+                     emoji: true
+                   },
+                   value: "value-4"
+                 }
+               ],
+               action_id: "static_select-action"
+             }
+           }
+         ]
+       }
     });
   } catch (error) {
     console.error(error);
@@ -72,5 +167,6 @@ app.command('/mongo', async ({ ack, say }) => {
 // STARTS THE APP
 (async () => {
   await app.start(port);
+
   console.log('⚡️ Bolt app is running!');
 })();
