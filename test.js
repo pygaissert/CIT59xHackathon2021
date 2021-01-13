@@ -65,7 +65,7 @@ app.command('/modal', async ({ ack, body, client }) => {
 	       type: "modal",
 	       title: {
            type: "plain_text",
-		       text: "My App",
+		       text: "Elicit",
 		       emoji: true
          },
          submit: {
