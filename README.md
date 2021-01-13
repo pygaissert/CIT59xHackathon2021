@@ -15,11 +15,19 @@ Dana Yang | 2022
 ​
 **General Idea**  - A general description of what your software will do  
 The program allows users in the same workspace to find other users with skillsets that they would like to learn more about or collaborate on a project together. The slackbot intakes basic information and skills from every user and compiles it into a database. When prompted for a certain skill in the database, the slackbot will list all users with the desired skillset and allow the user to message users with those skillsets.
+
+Functionalities:  
+- Keep a database of MCIT slack user's skills sets
+- Use form to add user information into the database with with matching criteria
+- Periodically suggest user to have conversation
+- Allow user to post question and send invitation to answer to user that has related expertise
+- more...
 ​
 **Anticipated Stack** - What technologies do you anticipate using?  
 NodeJS
 Bolt for JavaScript (Slack API)
 MongoDB Atlas (Database)
+Heroku (NodeJS hosting)
 ​
 **Presentation URL** - At the end of the hackathon, upload your presentation to YouTube/Vimeo (unlisted) and place it here.  
 Enter URL here
