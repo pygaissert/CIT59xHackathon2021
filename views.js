@@ -75,6 +75,91 @@ const existingUserGreeting = function (user) {
   }
 };
 
+
+// function to show question view
+const question = function (list) {
+  return{
+        type: "modal",
+      	title: {
+      		type: "plain_text",
+      		text: "My App",
+      		emoji: true
+      	},
+      	submit: {
+      		type: "plain_text",
+      		text: "Submit",
+      		emoji: true
+      	},
+      	close: {
+      		type: "plain_text",
+      		text: "Cancel",
+      		emoji: true
+      	},
+      	blocks: [
+      		{
+      			type: "input",
+      			element: {
+      				type: "plain_text_input",
+      				multiline: true,
+      				action_id: "plain_text_input-action",
+      				placeholder: {
+      					type: "plain_text",
+      					text: "Example: What is the best language to learn for Data jobs?"
+      				}
+      			},
+      			label: {
+      				type: "plain_text",
+      				text: "Ask a question:",
+      				emoji: true
+      			}
+      		},
+      		{
+      			type: "section",
+      			block_id: "section678",
+      			text: {
+      				type: "mrkdwn",
+      				text: "Select related topic"
+      			},
+      			accessory: {
+      				action_id: "skill_get",
+      				type: "multi_static_select",
+      				placeholder: {
+      					type: "plain_text",
+      					text: "Select question related skills"
+      				},
+      				options: list
+      			}
+      		},
+      		{
+      			type: "input",
+      			element: {
+      				type: "multi_users_select",
+      				placeholder: {
+      					type: "plain_text",
+      					text: "Select people to ask this question to:",
+      					emoji: true
+      				},
+      				action_id: "multi_users_select-action"
+      			},
+      			label: {
+      				type: "plain_text",
+      				text: "Optional: add preference",
+      				emoji: true
+      			}
+      		}
+      	],
+        submit: {
+          type: 'plain_text',
+          text: 'Submit'
+        }
+  }
+}
+
+
+
+
+
+
 const test = {
   type: 'modal',
   callback_id: 'view_1',
@@ -122,5 +207,6 @@ module.exports = {
   // Template modal from Slack's website
   test: test,
   newUserGreeting: newUserGreeting,
-  existingUserGreeting: existingUserGreeting
+  existingUserGreeting: existingUserGreeting,
+  question: question
 }

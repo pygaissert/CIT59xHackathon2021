@@ -10,7 +10,6 @@ const slackBotToken = process.env.SLACK_BOT_TOKEN;
 const slackSigningSecret = process.env.SLACK_SIGNING_SECRET;
 const port = process.env.PORT || 3000;
 
-
 // INITIALIZES THE APP
 const { App } = require('@slack/bolt');
 const app = new App({
@@ -61,6 +60,34 @@ app.action('button_no', async({ ack, body, say }) => {
   await ack();
   await say("No problem! Let me know if you change your mind!")
 });
+
+
+
+// Modal view to allow user to ask a question
+app.action('button_ask',async({ack, body, client}) =>{
+  // acknowlege the command request
+  await ack();
+
+  // get the list of skillf from db
+  const list = await data.listSkills();
+  // console.log(list);
+
+  try {
+    // open modal view from views
+    const result = await client.views.open({
+      trigger_id: body.trigger_id,
+      // past list to question()
+      view: views.question(list)
+    });
+
+    console.log(result);
+  } catch (error){
+    console.error(error);
+  }
+});
+
+
+
 
 // STARTS THE APP
 (async () => {

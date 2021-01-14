@@ -49,37 +49,64 @@ const listSkills = async function() {
   // Connect client to MongoDB cluster
   await client.connect();
   // Get "skills" collection from "test_slack" database
-  collection = await client.db("slack-app").collection("topics");
-  // Get array of skill groups from "skills" collection
-  groups = await collection.distinct("group");
-  // Get array of skills from "skills" collection
-  //skills = await collection.find({}).sort({group: 1, name: 1}).toArray();
-  // Initialize an empty options array for the dropdown menu
+  collection = await client.db("app-data").collection("topics");
+
   let option_groups = [];
-  // Add each skill's name to the options array
-  for (group of groups) {
-    let options = [];
-    let skills = await collection.find({group: group}).sort({name: 1}).toArray();
-    for (skill of skills) {
-      options.push({
-        text: {
-          type: 'plain_text',
-          text: skill.name
-        }
-      });
-    }
-    option_groups.push({
-      label: {
-        type: 'plain_text',
-        text: group
-      },
-      options: options
-    });
-  }
+
+  // get each skill name, push to option_group
+  await collection.find({}).sort({group: 1, name: 1}).forEach( function(item) {
+    // console.log( "Skill: " + item.name );
+    option_groups.push(
+        {
+          text: {
+            type: 'plain_text',
+            text: item.name
+          },
+          value: item.name // MAYBE CHANGE THIS
+        });
+  });
+  // console.log( option_groups );
+
+
+  // FIX THIS
+  // Get array of skill groups from "skills" collection
+  // groups = await collection.find({});
+  //
+  // // Get array of skills from "skills" collection
+  // // skills = await collection.find({}).sort({group: 1, name: 1}).toArray();
+  // // Initialize an empty options array for the dropdown menu
+  // let option_groups = [];
+  // // Add each skill's name to the options array
+  // for (group of groups) {
+  //   // let options = [];
+  //   let skills = await collection.find({group: group}).sort({name: 1}).toArray();
+  //   for (skill of skills) {
+  //     console.log(skill.name);
+  //
+  //
+  //     option_groups.push(
+  //       {
+  //       text: {
+  //         type: 'plain_text',
+  //         text: skill.name
+  //       },
+  //       value: "value-0"
+  //     });
+  //   }
+  //   // option_groups.push({
+  //   //   label: {
+  //   //     type: 'plain_text',
+  //   //     text: group
+  //   //   },
+  //   //   options: options
+  //   // });
+  // }
+
   return option_groups;
 }
 
 module.exports = {
   addUser: addUser,
-  userExists: userExists
+  userExists: userExists,
+  listSkills:listSkills
 }
