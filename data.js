@@ -43,43 +43,50 @@ const addUser = async function(userName, userId) {
   });
 }
 
+// Copied from Jintong's code
 const listSkills = async function() {
   // Create new MongoDB client
   let client = new MongoClient(uri, { useUnifiedTopology: true });
   // Connect client to MongoDB cluster
   await client.connect();
   // Get "skills" collection from "test_slack" database
-  collection = await client.db("slack-app").collection("topics");
-  // Get array of skill groups from "skills" collection
-  groups = await collection.distinct("group");
-  // Get array of skills from "skills" collection
-  //skills = await collection.find({}).sort({group: 1, name: 1}).toArray();
-  // Initialize an empty options array for the dropdown menu
+  collection = await client.db("app-data").collection("topics");
+  // 2d array to store option_groups for modal view
   let option_groups = [];
-  // Add each skill's name to the options array
+  // get array of groups (strings) from skilsl collection
+  let groups = await collection.distinct("group");
+  // for each group, get a 1-d option array
   for (group of groups) {
-    let options = [];
-    let skills = await collection.find({group: group}).sort({name: 1}).toArray();
-    for (skill of skills) {
-      options.push({
-        text: {
-          type: 'plain_text',
-          text: skill.name
+    // get option array
+    let option = [];
+    // find each JSON under group:group, push to option
+    let eachColl = await collection.find({group:group}).forEach( function(item) {
+      option.push(
+        {
+          text: {
+            type: 'plain_text',
+            text: item.name
+          },
+          value: item.name
         }
+      );
+    });
+    // after 1D option array is complete, add label and push an option group to 2-D array
+    option_groups.push(
+      {
+        label: {
+          type: "plain_text",
+          text: group
+        },
+        options: option
       });
     }
-    option_groups.push({
-      label: {
-        type: 'plain_text',
-        text: group
-      },
-      options: options
-    });
+    return option_groups;
   }
-  return option_groups;
-}
+  // end copy
 
 module.exports = {
   addUser: addUser,
-  userExists: userExists
+  userExists: userExists,
+  listSkills: listSkills
 }
