@@ -1,11 +1,9 @@
 # MCIT On-Campus 2021 Winter Hackathon  
-### Project/Team Name:
+### Project/Team Name: Untitled MCIT Slack App
 ##  
 ​
-*Remove the line below when committing your proposal*  
-**This proposal is due by the end of day on Wednesday Jan 13. This is here to get you to think about your project beforehand and for our record keeping.**
 ​
-**Team Members**  Use format below  
+**Team Members**
 Name | Year
 ------------ | -------------
 Philipp Gaissert | 2022
@@ -13,21 +11,25 @@ Jintong Wu | 2022
 Dana Yang | 2022
 ​
 ​
-**General Idea**  - A general description of what your software will do  
-The program allows users in the same workspace to find other users with skillsets that they would like to learn more about or collaborate on a project together. The slackbot intakes basic information and skills from every user and compiles it into a database. When prompted for a certain skill in the database, the slackbot will list all users with the desired skillset and allow the user to message users with those skillsets.
+**General Idea**
+Have you ever been stuck on a project, but you didn't know where to look for help? With our Slack app, we aim to harness the collective skills and experiences of the MCIT student body so that no problem will ever go unsolved. The app will ask students to list out their unique sets of technical and creative skills, as well as their knowledge of particular industries. Then, whenever someone has a burning question about JavaScript, machine learning, graphic design, the healthcare industry, editing a cover letter, or even general organization techniques, our app will help direct their question to one of their many benevolent classmates. All from the comfort of the MCIT Slack workspace! We hope that our app will foster a greater sense of community in the MCIT program, and encourage students to be each other's greatest allies.
 
-Functionalities:  
-- Keep a database of MCIT slack user's skills sets
-- Use form to add user information into the database with with matching criteria
-- Periodically suggest user to have conversation
-- Allow user to post question and send invitation to answer to user that has related expertise
+**Anticipated Stack**
+- NodeJS
+- Bolt for JavaScript (Slack API)
+- MongoDB Atlas (Database)
+- Heroku (NodeJS hosting)
+
+
+**Functionalities**  
+- Maintain a database of MCIT Slack user's skill sets based on their Slack user IDs
+- Utilize the Slack API's suite of GUI elements to interact with users
+- Direct questions from users towards students based on the specified topic
+- Periodically suggest users with similar skill sets to have conversation
 - more...
+
+
 ​
-**Anticipated Stack** - What technologies do you anticipate using?  
-NodeJS
-Bolt for JavaScript (Slack API)
-MongoDB Atlas (Database)
-Heroku (NodeJS hosting)
 ​
-**Presentation URL** - At the end of the hackathon, upload your presentation to YouTube/Vimeo (unlisted) and place it here.  
-Enter URL here
+**Presentation URL**
+*Pending*
