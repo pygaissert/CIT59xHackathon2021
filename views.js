@@ -127,7 +127,7 @@ const question = function (list) {
       					type: "plain_text",
       					text: "Select question related skills"
       				},
-      				options: list
+      				option_groups: list
       			}
       		},
       		{

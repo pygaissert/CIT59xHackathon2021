@@ -51,62 +51,115 @@ const listSkills = async function() {
   // Get "skills" collection from "test_slack" database
   collection = await client.db("app-data").collection("topics");
 
+  // 2d array to store option_groups for modal view
   let option_groups = [];
 
-  // get each skill name, push to option_group
-  await collection.find({}).sort({group: 1, name: 1}).forEach( function(item) {
-    // console.log( "Skill: " + item.name );
-    option_groups.push(
+  // get array of groups (strings) from skilsl collection
+  let groups = await collection.distinct("group");
+
+  // for each group, get a 1-d option array
+  for (group of groups) {
+
+    // get option array
+    let option = [];
+
+    // find each JSON under group:group, push to option
+    let eachColl = await collection.find({group:group}).forEach( function(item) {
+      option.push(
         {
           text: {
             type: 'plain_text',
             text: item.name
           },
-          value: item.name // MAYBE CHANGE THIS
+          value: item.name
         });
-  });
-  // console.log( option_groups );
+      });
+
+      // after 1D option array is complete, add label and push an option group to 2-D array
+      option_groups.push(
+        {
+          label: {
+            type: "plain_text",
+            text: group
+          },
+          options: option
+        });
+    }
+
+      //   option_groups.push(
+      //       {
+      //         text: {
+      //           type: 'plain_text',
+      //           text: item.name
+      //         },
+      //         value: item.name // MAYBE CHANGE THIS to option_groups
+      //       });
+      // });
+      // console.log( option_groups );
 
 
-  // FIX THIS
-  // Get array of skill groups from "skills" collection
-  // groups = await collection.find({});
-  //
-  // // Get array of skills from "skills" collection
-  // // skills = await collection.find({}).sort({group: 1, name: 1}).toArray();
-  // // Initialize an empty options array for the dropdown menu
-  // let option_groups = [];
-  // // Add each skill's name to the options array
-  // for (group of groups) {
-  //   // let options = [];
-  //   let skills = await collection.find({group: group}).sort({name: 1}).toArray();
-  //   for (skill of skills) {
-  //     console.log(skill.name);
-  //
-  //
-  //     option_groups.push(
-  //       {
-  //       text: {
-  //         type: 'plain_text',
-  //         text: skill.name
-  //       },
-  //       value: "value-0"
-  //     });
-  //   }
-  //   // option_groups.push({
-  //   //   label: {
-  //   //     type: 'plain_text',
-  //   //     text: group
-  //   //   },
-  //   //   options: options
-  //   // });
-  // }
+      // FIX THIS
+      // Get array of skill groups from "skills" collection
+      // groups = await collection.find({});
+      //
+      // // Get array of skills from "skills" collection
+      // // skills = await collection.find({}).sort({group: 1, name: 1}).toArray();
+      // // Initialize an empty options array for the dropdown menu
+      // let option_groups = [];
+      // // Add each skill's name to the options array
+      // for (group of groups) {
+      //   // let options = [];
+      //   let skills = await collection.find({group: group}).sort({name: 1}).toArray();
+      //   for (skill of skills) {
+      //     console.log(skill.name);
+      //
+      //
+      //     option_groups.push(
+      //       {
+      //       text: {
+      //         type: 'plain_text',
+      //         text: skill.name
+      //       },
+      //       value: "value-0"
+      //     });
+      //   }
+      //   // option_groups.push({
+      //   //   label: {
+      //   //     type: 'plain_text',
+      //   //     text: group
+      //   //   },
+      //   //   options: options
+      //   // });
+      // }
 
-  return option_groups;
-}
+      // let alt = [        {
+      //           text: {
+      //             type: "plain_text",
+      //             text: "Java"
+      //           },
+      //           value: "value-0"
+      //         },
+      //         {
+      //           text: {
+      //             type: "plain_text",
+      //             text: "Python"
+      //           },
+      //           value: "value-1"
+      //         },
+      //         {
+      //           text: {
+      //             type: "plain_text",
+      //             text: "Data Visualization"
+      //           },
+      //           value: "value-2"
+      //         }]
 
-module.exports = {
-  addUser: addUser,
-  userExists: userExists,
-  listSkills:listSkills
-}
+
+      return option_groups;
+    }
+
+    module.exports = {
+      addUser: addUser,
+      userExists: userExists,
+      listSkills:listSkills
+    }
