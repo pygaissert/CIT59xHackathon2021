@@ -40,19 +40,33 @@ app.action('button_yes', async({ ack, body, say, client }) => {
     ts: body.container.message_ts,
     blocks: [
       {
-        "type": "section",
-        "text": {
-          "type": "mrkdwn",
-          "text": `Thank you for joining!`
-        }
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: "Thank you for joining!"
+        },
+      },
+      {
+        type: "actions",
+        elements: [
+          {
+            type: "button",
+            text: {
+              type: "plain_text",
+              text: "Click to create your profile!"
+            },
+            style: "primary",
+            action_id: "button_createProfile"
+          }
+        ]
       }
     ]
   });
-  try {
-    await data.addUser(body.user.name, body.user.id);
-  } catch (error) {
-    console.log(error);
-  }
+  // try {
+  //   await data.addUser(body.user.name, body.user.id);
+  // } catch (error) {
+  //   console.log(error);
+  // }
 });
 
 
@@ -61,6 +75,48 @@ app.action('button_no', async({ ack, body, say }) => {
   await say("No problem! Let me know if you change your mind!")
 });
 
+// Show modal to collect user information
+app.action('button_createProfile', async({ ack, body, say, client }) => {
+  await ack();
+  console.log(body.trigger_id);
+  let list = await data.listSkills();
+  try {
+    // Call the views.open method using one of the built-in WebClients
+    const result = await client.views.open({
+      // Pass a valid trigger_id within 3 seconds of receiving it
+      trigger_id: body.trigger_id,
+      // View payload
+      view: views.newUserInformation(list)
+    });
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+// Acknowledge academic year selection
+app.action('static_select-action', async({ ack, body, say, client }) => {
+  // save result of selected option
+  // const val = JSON.stringify(body['actions'][0]);
+  // confirm value on console
+  // console.log(val);
+  console.log(body);
+  // Acknowledge static_select
+  await ack();
+});
+
+// Acknowledge skills selection
+app.action('button_addSkill', async({ ack, body, say, client }) => {
+  console.log(body);
+  await ack();
+  try {
+    const result = await client.views.push({
+      trigger_id: body.trigger_id,
+      view: views.addSkill()
+    });
+  } catch (error){
+    console.error(error);
+  }
+});
 
 
 // Modal view to allow user to ask a question
@@ -104,6 +160,19 @@ app.view('question',async({ack, body, view, client}) =>{
 
 
 
+app.view('modal-intro', async({ ack, body, say, client }) => {
+  console.log(body);
+  await ack();
+});
+
+
+
+//app.action('programming_modal', async({}))
+
+// app.view_submission('modal', async({ ack, body, say }) => {
+//   await ack();
+//   console.log(body);
+// });
 
 // STARTS THE APP
 (async () => {

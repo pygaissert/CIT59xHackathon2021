@@ -206,10 +206,195 @@ const test = {
   }
 };
 
+const newUserInformation = function (list) {
+  return {
+    type: "modal",
+    callback_id: "modal-intro",
+    title: {
+      type: "plain_text",
+      text: "Elicit",
+      emoji: true
+    },
+    submit: {
+      type: "plain_text",
+      text: "Submit",
+      emoji: true
+    },
+    close: {
+      type: "plain_text",
+      text: "Cancel",
+      emoji: true
+    },
+    blocks: [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: "Welcome to Elicit! To participate, tell us about yourself!"
+        }
+      },
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: "Academic Status"
+        },
+        accessory: {
+          type: "static_select",
+          placeholder: {
+            type: "plain_text",
+            text: "year",
+            emoji: true
+          },
+          options: [
+            {
+              text: {
+                type: "plain_text",
+                text: "first year",
+                //emoji: true
+              },
+              value: "first year"
+            },
+            {
+              text: {
+                type: "plain_text",
+                text: "second year",
+                //emoji: true
+              },
+              value: "second year"
+            },
+            {
+              text: {
+                type: "plain_text",
+                text: "submatriculate",
+                //emoji: true
+              },
+              value: "submatriculate"
+            },
+            {
+              text: {
+                type: "plain_text",
+                text: "part-time",
+                //emoji: true
+              },
+              value: "part-time"
+            },
+            {
+              text: {
+                type: "plain_text",
+                text: "alumni",
+                //emoji: true
+              },
+              value: "alumni"
+            }
+          ],
+          action_id: "static_select-action"
+        }
+      },
+      {
+        type: "section",
+        block_id: "add-new-skill",
+        text: {
+          type: "mrkdwn",
+          text: "List your skills of expertise"
+        },
+        accessory: {
+          action_id: "topics",
+          type: "multi_static_select",
+          placeholder: {
+            type: "plain_text",
+            text: "Programming Languages, data visualization,..."
+          },
+          option_groups: list
+        }
+      },
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: "Don't see your skills listed above?"
+        },
+      },
+      {
+        type: "actions",
+        elements: [
+          {
+            type: "button",
+            text: {
+              type: "plain_text",
+              text: "Add a new skill"
+            },
+            style: "primary",
+            action_id: "button_addSkill"
+          }
+        ]
+      }
+    ]
+  }
+};
+
+const addSkill = function (){
+  return {
+    "type": "modal",
+    "title": {
+      "type": "plain_text",
+      "text": "Add A New Skill",
+      "emoji": true
+    },
+    "submit": {
+      "type": "plain_text",
+      "text": "Submit",
+      "emoji": true
+    },
+    "close": {
+      "type": "plain_text",
+      "text": "Cancel",
+      "emoji": true
+    },
+    "blocks": [
+      {
+        "type": "divider"
+      },
+      {
+        "dispatch_action": true,
+        "type": "input",
+        "element": {
+          "type": "plain_text_input",
+          "dispatch_action_config": {
+            "trigger_actions_on": [
+              "on_character_entered"
+            ]
+          },
+          "action_id": "plain_text_input-action"
+        },
+        "label": {
+          "type": "plain_text",
+          "text": "Topic",
+          "emoji": true
+        }
+      },
+      {
+        "type": "input",
+        "element": {
+          "type": "plain_text_input",
+          "action_id": "plain_text_input-action"
+        },
+        "label": {
+          "type": "plain_text",
+          "text": "Skill",
+          "emoji": true
+        }
+      }
+    ]
+  }
+};
+
 module.exports = {
   // Template modal from Slack's website
   test: test,
   newUserGreeting: newUserGreeting,
   existingUserGreeting: existingUserGreeting,
-  question: question
+  question: question,
+  newUserInformation: newUserInformation,
+  addSkill: addSkill
 }
