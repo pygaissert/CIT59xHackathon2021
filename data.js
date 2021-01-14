@@ -43,6 +43,8 @@ const addUser = async function(userName, userId) {
   });
 }
 
+
+
 const listSkills = async function() {
   // Create new MongoDB client
   let client = new MongoClient(uri, { useUnifiedTopology: true });
@@ -155,11 +157,32 @@ const listSkills = async function() {
       //         }]
 
 
-      return option_groups;
-    }
+  return option_groups;
+}
 
-    module.exports = {
-      addUser: addUser,
-      userExists: userExists,
-      listSkills:listSkills
-    }
+
+const listUsers = async function() {
+  // Create new MongoDB client
+  let client = new MongoClient(uri, { useUnifiedTopology: true });
+  // Connect client to MongoDB cluster
+  await client.connect();
+  // Get "skills" collection from "test_slack" database
+  collection = await client.db("app-data").collection("users");
+
+  // String array of user ID
+  let user_list = [];
+
+  // find each JSON under group:group, push to option
+  let eachColl = await collection.find({}).forEach( function(item) {
+    user_list.push(item.slack_id);
+  });
+
+  return user_list;
+}
+
+module.exports = {
+  addUser: addUser,
+  userExists: userExists,
+  listSkills:listSkills,
+  listUsers:listUsers
+}

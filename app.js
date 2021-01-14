@@ -67,20 +67,36 @@ app.action('button_no', async({ ack, body, say }) => {
 app.action('button_ask',async({ack, body, client}) =>{
   // acknowlege the command request
   await ack();
+  console.log("Acknowledged");
 
-  // get the list of skillf from db
-  const list = await data.listSkills();
-  // console.log(list);
+  // get the list of skill from db
+  const skillList = await data.listSkills();
+  //console.log(skillList);
+  const userList = await data.listUsers();
+  //console.log(userList);
 
   try {
     // open modal view from views
     const result = await client.views.open({
       trigger_id: body.trigger_id,
       // past list to question()
-      view: views.question(list)
+      view: views.question(skillList)
     });
 
     console.log(result);
+  } catch (error){
+    console.error(error);
+  }
+});
+
+// when user submit question, read view_submission
+app.view('question',async({ack, body, view, client}) =>{
+  // acknowlege the command request
+  await ack();
+  console.log("View Acknowledged");
+
+  try {
+
   } catch (error){
     console.error(error);
   }

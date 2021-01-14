@@ -77,12 +77,13 @@ const existingUserGreeting = function (user) {
 
 
 // function to show question view
-const question = function (list) {
+const question = function (skillList, userList) {
   return{
         type: "modal",
+        callback_id: "question",
       	title: {
       		type: "plain_text",
-      		text: "My App",
+      		text: "Ask a question:",
       		emoji: true
       	},
       	submit: {
@@ -127,7 +128,7 @@ const question = function (list) {
       					type: "plain_text",
       					text: "Select question related skills"
       				},
-      				option_groups: list
+      				option_groups: skillList
       			}
       		},
       		{
@@ -139,14 +140,16 @@ const question = function (list) {
       					text: "Select people to ask this question to:",
       					emoji: true
       				},
-      				action_id: "multi_users_select-action"
+      				action_id: "multi_users_select-action",
+              initial_users: ["U01JNHU7S4T","U01JMNX5NSF"]
       			},
       			label: {
       				type: "plain_text",
       				text: "Optional: add preference",
       				emoji: true
       			}
-      		}
+      		},
+
       	],
         submit: {
           type: 'plain_text',
