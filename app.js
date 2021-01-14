@@ -99,7 +99,7 @@ app.action('static_select-action', async({ ack, body, say, client }) => {
   // const val = JSON.stringify(body['actions'][0]);
   // confirm value on console
   // console.log(val);
-  console.log(body);
+  console.log(body.actions[0].selected_option.text.text);
   // Acknowledge static_select
   await ack();
 });

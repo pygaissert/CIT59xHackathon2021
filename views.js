@@ -158,11 +158,6 @@ const question = function (skillList, userList) {
   }
 }
 
-
-
-
-
-
 const test = {
   type: 'modal',
   callback_id: 'view_1',
