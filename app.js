@@ -98,16 +98,26 @@ app.action('static_select-action', async({ ack, body, say, client }) => {
   // save result of selected option
   // const val = JSON.stringify(body['actions'][0]);
   // confirm value on console
-  // console.log(val);
-  console.log(body.actions[0].selected_option.text.text);
+  // print out selected academic year value
+  //console.log(body.actions[0].selected_option.text.text);
   // Acknowledge static_select
   await ack();
 });
 
-// Acknowledge skills selection
-app.action('button_addSkill', async({ ack, body, say, client }) => {
-  console.log(body);
+// Acknowledge multi-seelct skills
+app.action('select_skill', async({ ack, body, say, client }) => {
+  // print out info
+  //console.log(body.actions[0].selected_options[0]);
+  // Acknowledge selection of skill
   await ack();
+});
+
+// Acknowledge selection of new skill and creation of new stacked modal
+app.action('button_addSkill', async({ ack, body, say, client }) => {
+  //console.log(body);
+  // Acknowledge addSkill button
+  await ack();
+  // open new modal view to add new skill
   try {
     const result = await client.views.push({
       trigger_id: body.trigger_id,
@@ -118,6 +128,61 @@ app.action('button_addSkill', async({ ack, body, say, client }) => {
   }
 });
 
+// Acknowledge character input on Add Skills Modal: Topic of expertise
+app.action('add_Topic', async({ ack, body, say, client}) => {
+  //acknowlege character input
+  await ack();
+});
+
+// Acknowledge character input on Add Skills Modal: skill
+app.action('add_Skill', async({ ack, body, say, client}) => {
+  //acknowlege character input
+  await ack();
+});
+
+// Submission of introduction modal and extraction of data
+app.view('modal-intro', async({ ack, view, body, say, client }) => {
+  // print out selected academic year value
+  //console.log(view.state.values.select_year['static_select-action'].selected_option.value);
+  let year = view.state.values.select_year['static_select-action'].selected_option.value;
+  console.log(year);
+  // parse through selected skills
+  let skillList = view.state.values.select_skill.select_skill.selected_options;
+  var skills = [];
+  for (i = 0; i < skillList.length; i++){
+    skills.push(skillList[i].value);
+  }
+  // print out selected skills on console
+  console.log(skills);
+
+  //SORT SKILL LIST?????
+
+  // Acknowledge submission of modal
+  await ack();
+  try {
+    await data.addUser(body.user.name, body.user.id, year, skills);
+  } catch (error) {
+    console.log(error);
+  }
+  // await say("Profile added to database!")
+});
+
+// Submission of introduction's stacked add modal view
+app.view('NewSkill', async({ ack, view, body, say, client }) => {
+  //print group value
+  let topic = view.state.values.add_new_topic.add_Topic.value;
+  console.log(topic);
+  // print skill value
+  let skill = view.state.values.add_new_skill.add_Skill.value;
+  console.log(skill);
+  await ack();
+  // Add to MongoDB database
+  try {
+    await data.addSkill(topic, skill);
+  } catch (error) {
+    console.log(error);
+  }
+});
 
 // Modal view to allow user to ask a question
 app.action('button_ask',async({ack, body, client}) =>{
@@ -158,12 +223,6 @@ app.view('question',async({ack, body, view, client}) =>{
   }
 });
 
-
-
-app.view('modal-intro', async({ ack, body, say, client }) => {
-  console.log(body);
-  await ack();
-});
 
 
 

@@ -228,8 +228,10 @@ const newUserInformation = function (list) {
           text: "Welcome to Elicit! To participate, tell us about yourself!"
         }
       },
+      // Static select button for student status
       {
         type: "section",
+        block_id: "select_year",
         text: {
           type: "mrkdwn",
           text: "Academic Status"
@@ -286,15 +288,16 @@ const newUserInformation = function (list) {
           action_id: "static_select-action"
         }
       },
+      // List skills from a external multi-select
       {
         type: "section",
-        block_id: "add-new-skill",
+        block_id: "select_skill",
         text: {
           type: "mrkdwn",
           text: "List your skills of expertise"
         },
         accessory: {
-          action_id: "topics",
+          action_id: "select_skill",
           type: "multi_static_select",
           placeholder: {
             type: "plain_text",
@@ -330,54 +333,57 @@ const newUserInformation = function (list) {
 
 const addSkill = function (){
   return {
-    "type": "modal",
-    "title": {
-      "type": "plain_text",
-      "text": "Add A New Skill",
-      "emoji": true
+    type: "modal",
+    callback_id: "NewSkill",
+    title: {
+      type: "plain_text",
+      text: "Add A New Skill",
+      emoji: true
     },
-    "submit": {
-      "type": "plain_text",
-      "text": "Submit",
-      "emoji": true
+    submit: {
+      type: "plain_text",
+      text: "Submit",
+      emoji: true
     },
-    "close": {
-      "type": "plain_text",
-      "text": "Cancel",
-      "emoji": true
+    close: {
+      type: "plain_text",
+      text: "Cancel",
+      emoji: true
     },
-    "blocks": [
+    blocks: [
       {
-        "type": "divider"
+        type: "divider"
       },
       {
-        "dispatch_action": true,
-        "type": "input",
-        "element": {
-          "type": "plain_text_input",
-          "dispatch_action_config": {
-            "trigger_actions_on": [
+        dispatch_action: true,
+        type: "input",
+        block_id: "add_new_topic",
+        element: {
+          type: "plain_text_input",
+          dispatch_action_config: {
+            trigger_actions_on: [
               "on_character_entered"
             ]
           },
-          "action_id": "plain_text_input-action"
+          action_id: "add_Topic"
         },
-        "label": {
-          "type": "plain_text",
-          "text": "Topic",
-          "emoji": true
+        label: {
+          type: "plain_text",
+          text: "Topic of Expertise",
+          emoji: true
         }
       },
       {
-        "type": "input",
-        "element": {
-          "type": "plain_text_input",
-          "action_id": "plain_text_input-action"
+        type: "input",
+        block_id: "add_new_skill",
+        element: {
+          type: "plain_text_input",
+          action_id: "add_Skill"
         },
-        "label": {
-          "type": "plain_text",
-          "text": "Skill",
-          "emoji": true
+        label: {
+          type: "plain_text",
+          text: "Skill",
+          emoji: true
         }
       }
     ]

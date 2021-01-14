@@ -20,7 +20,7 @@ const userExists = async function(userId) {
   client.close();
 }
 
-const addUser = async function(userName, userId) {
+const addUser = async function(userName, userId, userYear, userSkills) {
   // Create new MongoDB client
   let client = new MongoClient(uri, { useUnifiedTopology: true });
   // Connect client to MongoDB cluster
@@ -29,7 +29,9 @@ const addUser = async function(userName, userId) {
   collection = await client.db("app-data").collection("users");
   user = {
     name: userName,
-    slack_id: userId
+    slack_id: userId,
+    year: userYear,
+    skill: userSkills
   }
   await collection.insertOne(user, {w: 1}, function(err, doc) {
     if (err) {
@@ -38,6 +40,29 @@ const addUser = async function(userName, userId) {
     }
     let saved = doc.ops[0];
     console.log(`${saved._id}: ${saved.name} (${saved.slack_id})`);
+    // Disconnect client from MongoDB cluster
+    client.close();
+  });
+}
+
+const addSkill = async function(topic, skill) {
+  //create new MongoDB client
+  let client = new MongoClient(uri, { useUnifiedTopology: true });
+  // Connect client to MongoDB cluster
+  await client.connect();
+  // Get "users" collection from "test_slack" database
+  collection = await client.db("app-data").collection("topics");
+  topic = {
+    name: skill,
+    group: topic
+  }
+  await collection.insertOne(topic, {w: 1}, function(err, doc) {
+    if (err) {
+      console.log(err);
+      process.exit(0);
+    }
+    let saved = doc.ops[0];
+    console.log(`${saved._id}: ${saved.group} (${saved.name})`);
     // Disconnect client from MongoDB cluster
     client.close();
   });
@@ -184,5 +209,6 @@ module.exports = {
   addUser: addUser,
   userExists: userExists,
   listSkills:listSkills,
-  listUsers:listUsers
+  listUsers:listUsers,
+  addSkill: addSkill
 }
