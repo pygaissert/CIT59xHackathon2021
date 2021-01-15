@@ -174,6 +174,25 @@ app.view('modal-intro', async({ ack, body, say, client }) => {
 //   console.log(body);
 // });
 
+
+// adding some basic function below:
+
+// app homepage
+app.event('app_home_opened', async({ event, client }) =>{
+
+  console.log("home opened!!!!!");
+  try{
+    // publish home page when user click home
+    const result = await client.views.publish({
+        user_id: event.user,
+        view: await views.homepage(event)
+    });
+    console.log(result);
+  } catch (error){
+    console.error(error);
+  }
+});
+
 // STARTS THE APP
 (async () => {
   await app.start(port);
