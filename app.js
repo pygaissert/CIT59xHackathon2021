@@ -4,6 +4,7 @@ require('dotenv').config();
 // IMPORT OUR MODULES
 const views = require('./views');
 const data = require('./data');
+const parse = require('./parse');
 
 // IMPORTS VARIABLES FROM .env
 const slackBotToken = process.env.SLACK_BOT_TOKEN;
@@ -42,7 +43,7 @@ app.action('button_yes', async({ ack, body, say, client }) => {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: "Thank you for joining!"
+          text: "Then let's get you started!"
         },
       },
       {
@@ -89,7 +90,7 @@ app.action('button_createProfile', async({ ack, body, say, client }) => {
       trigger_id: body.trigger_id,
       // Pass a valid view_id
       // View payload
-      view: await views.newUserInformation()
+      view: await views.newUserInformation(body.channel.id, body.container.message_ts)
     });
     console.log(result);
   } catch (error) {
@@ -153,40 +154,25 @@ app.action('add_Skill', async({ ack, body, say, client}) => {
 
 // Submission of introduction modal and extraction of data
 app.view('modal-newuser', async({ ack, view, body, say, client }) => {
-  // print out selected academic year value
-  //console.log(view.state.values.select_year['static_select-action'].selected_option.value);
-  let year = view.state.values.select_year['static_select-action'].selected_option.value;
-  console.log(year);
-  // parse through selected skills
-  let skillList = view.state.values.select_skill.select_skill.selected_options;
-  var skills = [];
-  for (i = 0; i < skillList.length; i++){
-    skills.push(skillList[i].value);
-  }
-  // print out selected skills on console
-  console.log(skills);
   // Acknowledge submission of modal
   await ack();
+  console.log(body);
+  let values = view.state.values;
+  let year = values.select_year.select_year.selected_option.value;
+  // parse through selected skills
+  let skills = parse.getValuesFromOptions(values.select_topics_newuser.select_topics_newuser.selected_options);
   try {
     await data.addUser(body.user.name, body.user.id, year, skills);
     await client.chat.update({
-      channel: body.channel.id,
-      ts: body.container.message_ts,
-      blocks: [
-        {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: "Profile successfully added to database!"
-          },
-        }
-      ]
+      channel: view.private_metadata.split('_')[0],
+      ts: view.private_metadata.split('_')[1],
+      blocks: [],
+      text: `All done! Thank you for joining, <@${body.user.id}>!`,
+      message: {
+        text: `All done! Thank you for joining, <@${body.user.id}>!`,
+        user: body.user.id
+      }
     });
-    // await client.chat.update({
-    //   channel: body.channel.id,
-    //   ts: body.container.message_ts,
-    //   blocks: views.existingUserGreeting(message.user)
-    // })
   } catch (error) {
     console.log(error);
   }
@@ -234,7 +220,7 @@ app.view('submit_question', async({ ack, body, view, client }) => {
   // acknowlege the command request
   await ack();
   console.log("Acknowledged - Question Submitted");
-  submission = parseQuestionSubmission(view, body.user.id);
+  submission = parse.parseQuestionSubmission(view, body.user.id);
   console.log(submission.users);
   try {
     let result = await client.conversations.open({
@@ -275,7 +261,7 @@ app.action('select_topics_question', async({ ack, body, action, client }) => {
   if (action.selected_options.length == 0) {
     updatedQuestionForm.blocks[2] = views.noTopicsSelected;
   } else {
-    let updated_topics = getValuesFromOptions(action.selected_options);
+    let updated_topics = parse.getValuesFromOptions(action.selected_options);
     // Get list of Slack IDs associated with the selected topics
     userList = await data.findUsersByTopics(updated_topics);
     // Check for empty topic groups
@@ -300,69 +286,6 @@ app.action('select_users_question', async({ack}) => {
   await ack();
   console.log("Acknowledged - User Selected")
 })
-
-const getValuesFromOptions = function(options) {
-  let values = [];
-  options.forEach( function(option) {
-    values.push(`${option.value}`);
-  });
-  return values;
-}
-
-const prepareBotMessage = function(user, topics) {
-  topicsString = topics[topics.length - 1];
-  if (topics.length > 1) {
-    topics = topics.slice(0, topics.length - 1);
-    topicsString = topics.join(", ") + " and " + topicsString;
-  }
-  return `<@${user}> has a question for you! about ${topicsString}!`;
-}
-
-const parseQuestionSubmission = function(view, user) {
-  topics = getValuesFromOptions(view.state.values.select_topics_question.select_topics_question.selected_options).join(', ');
-  users = getValuesFromOptions(view.state.values.select_users_question.select_users_question.selected_options);
-  if (!users.includes(user)) {
-    users.push(user);
-  }
-  users = users.join(', ');
-  question = view.state.values.input_question.input_question.value;
-
-  return {
-    topics: topics,
-    users: users,
-    question: question
-  }
-}
-
-const isOptionGroupEmpty = function(option_groups) {
-  let empty_groups = [];
-  option_groups.forEach( function(group) {
-    if (group.options.length == 0) {
-      empty_groups.push(group.label.text);
-    }
-  });
-  console.log(empty_groups);
-}
-// app.options('select_user', async({ ack, options, body }) => {
-//   try {
-//     console.log(body);
-//     await ack();
-//     // await ack({
-//     //   option_groups: option_groups
-//     // });
-//   } catch (error) {
-//     console.error(error);
-//   }
-//   });
-
-
-//app.action('programming_modal', async({}))
-
-// app.view_submission('modal', async({ ack, body, say }) => {
-//   await ack();
-//   console.log(body);
-// });
-
 
 // adding some basic function below:
 

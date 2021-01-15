@@ -90,10 +90,11 @@ const existingUserGreeting = function (user) {
 
 /* NEW USER FORM */
 
-const newUserInformation = async function () {
+const newUserInformation = async function (channel, timestamp) {
   topicList = await data.listTopics();
   return {
     type: "modal",
+    private_metadata: `${channel}_${timestamp}`,
     callback_id: "modal-newuser",
     title: {
       type: "plain_text",
@@ -181,7 +182,7 @@ const newUserInformation = async function () {
       // List skills from a external multi-select
       {
         type: "section",
-        block_id: "select_skill",
+        block_id: "select_topics_newuser",
         text: {
           type: "mrkdwn",
           text: "List your skills of expertise"
