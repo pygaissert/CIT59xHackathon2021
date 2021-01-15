@@ -4,10 +4,13 @@
 // FOR INITIALIZING MONGODB CLIENTS
 const MongoClient = require('mongodb').MongoClient;
 const uri = process.env.MONGODB_CONNECTION;
+const newClient = function() {
+  return new MongoClient(uri, { useUnifiedTopology: true });
+}
 
 const userExists = async function(userId) {
   // Create new MongoDB client
-  let client = new MongoClient(uri, { useUnifiedTopology: true });
+  let client = newClient();
   // Connect client to MongoDB cluster
   await client.connect();
   collection = await client.db("app-data").collection("users");
@@ -22,10 +25,10 @@ const userExists = async function(userId) {
 
 const addUser = async function(userName, userId) {
   // Create new MongoDB client
-  let client = new MongoClient(uri, { useUnifiedTopology: true });
+  let client = newClient();
   // Connect client to MongoDB cluster
   await client.connect();
-  // Get "users" collection from "test_slack" database
+  // Get "users" collection from "app-data" database
   collection = await client.db("app-data").collection("users");
   user = {
     name: userName,
@@ -44,48 +47,42 @@ const addUser = async function(userName, userId) {
 }
 
 
-
-const listSkills = async function() {
+// Returns all skills sorted by group, formatted as [{ options: [{},...] },...]
+const listTopics = async function() {
   // Create new MongoDB client
-  let client = new MongoClient(uri, { useUnifiedTopology: true });
+  let client = newClient();
   // Connect client to MongoDB cluster
   await client.connect();
-  // Get "skills" collection from "test_slack" database
+  // Get "topics" collection from "app-data" database
   collection = await client.db("app-data").collection("topics");
-
-  // 2d array to store option_groups for modal view
+  // Empty array to store option_groups for select menu
   let option_groups = [];
-
-  // get array of groups (strings) from skilsl collection
-  let groups = await collection.distinct("group");
-
-  // for each group, get a 1-d option array
-  for (group of groups) {
-
-    // get option array
-    let option = [];
-
-    // find each JSON under group:group, push to option
-    let eachColl = await collection.find({group:group}).forEach( function(item) {
-      option.push(
+  // Get array of distinct topic groups (strings) from "topics" collection
+  let topic_groups = await collection.distinct("group");
+  // Iterate over the topic groups
+  for (group of topic_groups) {
+    // Empty array to store options in current option_group
+    let options = [];
+    // Get topics in current topic group, and add formatted JSON to options[]
+    await collection.find({group:group}).sort({"name": 1}).forEach( function(topic) {
+      options.push(
         {
           text: {
             type: 'plain_text',
-            text: item.name
+            text: topic.name
           },
-          value: item.name
+          value: topic.name
         });
       });
-
-      // after 1D option array is complete, add label and push an option group to 2-D array
-      option_groups.push(
-        {
-          label: {
-            type: "plain_text",
-            text: group
-          },
-          options: option
-        });
+    // After topics have been added to options[], add formatted JSON to option_groups[]
+    option_groups.push(
+      {
+        label: {
+          type: "plain_text",
+          text: group
+        },
+        options: options
+      });
     }
 
       //   option_groups.push(
@@ -163,26 +160,81 @@ const listSkills = async function() {
 
 const listUsers = async function() {
   // Create new MongoDB client
-  let client = new MongoClient(uri, { useUnifiedTopology: true });
+  let client = newClient();
   // Connect client to MongoDB cluster
   await client.connect();
   // Get "skills" collection from "test_slack" database
   collection = await client.db("app-data").collection("users");
-
   // String array of user ID
   let user_list = [];
-
   // find each JSON under group:group, push to option
   let eachColl = await collection.find({}).forEach( function(item) {
     user_list.push(item.slack_id);
   });
-
   return user_list;
+}
+
+const addTopicToUser = async function() {
+  // Create new MongoDB client
+  let client = newClient();
+  // Connect client to MongoDB cluster
+  await client.connect();
+  // Get "topics-users"
+  collection = await client.db("app-data").collection("topics-users");
+  relation = {
+    topic: topic,
+    slack_id: userId
+  }
+  await collection.insertOne(relation, {w: 1}, function(err, doc) {
+    if (err) {
+      console.log(err);
+      process.exit(0);
+    }
+    let saved = doc.ops[0];
+    console.log(`${saved._id}: ${saved.name} (${saved.slack_id})`);
+    // Disconnect client from MongoDB cluster
+    client.close();
+  });
+}
+
+const findUsersByTopics = async function(topics) {
+  // Create new MongoDB client
+  let client = newClient();
+  // Connect client to MongoDB cluster
+  await client.connect();
+  // Get "topics-users" collection from "app-data" database
+  let collection = await client.db("app-data").collection("topics-users");
+  let topic_groups = [];
+  for (topic of topics) {
+    let users = [];
+    await collection.find({"topic":topic}).forEach( function(doc) {
+      users.push(
+        {
+          text: {
+            type: "plain_text",
+            text: `${doc.user}`
+          },
+          value: `${doc.user}`
+      }
+    );
+    });
+    topic_groups.push(
+      {
+        label: {
+          type: "plain_text",
+          text: topic
+        },
+        "options": users
+    });
+  }
+  return topic_groups;
 }
 
 module.exports = {
   addUser: addUser,
   userExists: userExists,
-  listSkills:listSkills,
-  listUsers:listUsers
+  listTopics:listTopics,
+  listUsers:listUsers,
+  addTopicToUser: addTopicToUser,
+  findUsersByTopics: findUsersByTopics
 }

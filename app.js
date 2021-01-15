@@ -32,7 +32,6 @@ app.message(/^([Hh]ello)|([Hh]i).*/, async({message, say}) => {
   }
 });
 
-
 app.action('button_yes', async({ ack, body, say, client }) => {
   await ack();
   await client.chat.update({
@@ -62,39 +61,43 @@ app.action('button_yes', async({ ack, body, say, client }) => {
       }
     ]
   });
-  // try {
-  //   await data.addUser(body.user.name, body.user.id);
-  // } catch (error) {
-  //   console.log(error);
-  // }
 });
 
 
-app.action('button_no', async({ ack, body, say }) => {
+app.action('button_no', async({ ack, body, say, client }) => {
   await ack();
-  await say("No problem! Let me know if you change your mind!")
+  await client.chat.update({
+    channel: body.channel.id,
+    ts: body.container.message_ts,
+    blocks: [],
+    text: "No problem! Let me know if you change your mind!",
+    message: {
+      text: "No problem! Let me know if you change your mind!",
+      user: body.user.id
+    }
+  });
 });
 
-// Show modal to collect user information
+// ACTION:   button_createProfile
+// RESPONSE: Show modal to collect user information
 app.action('button_createProfile', async({ ack, body, say, client }) => {
   await ack();
-  console.log(body.trigger_id);
-  let list = await data.listSkills();
   try {
     // Call the views.open method using one of the built-in WebClients
     const result = await client.views.open({
       // Pass a valid trigger_id within 3 seconds of receiving it
       trigger_id: body.trigger_id,
       // View payload
-      view: views.newUserInformation(list)
+      view: await views.newUserInformation()
     });
   } catch (error) {
     console.error(error);
   }
 });
 
-// Acknowledge academic year selection
-app.action('static_select-action', async({ ack, body, say, client }) => {
+// ACTION:   static_select-action
+// RESPONSE: Acknowledge academic year selection
+app.action('select_year', async({ ack, body, say, client }) => {
   // save result of selected option
   // const val = JSON.stringify(body['actions'][0]);
   // confirm value on console
@@ -104,7 +107,8 @@ app.action('static_select-action', async({ ack, body, say, client }) => {
   await ack();
 });
 
-// Acknowledge skills selection
+// ACTION:   button_addSkill
+// RESPONSE: Acknowledge skills selection
 app.action('button_addSkill', async({ ack, body, say, client }) => {
   console.log(body);
   await ack();
@@ -118,39 +122,34 @@ app.action('button_addSkill', async({ ack, body, say, client }) => {
   }
 });
 
-
-// Modal view to allow user to ask a question
-app.action('button_ask',async({ack, body, client}) =>{
-  // acknowlege the command request
+app.action('select_topics_newuser', async({ ack}) => {
   await ack();
-  console.log("Acknowledged");
+})
 
-  // get the list of skill from db
-  const skillList = await data.listSkills();
-  //console.log(skillList);
-  const userList = await data.listUsers();
-  //console.log(userList);
+/* QUESTION FORM */
 
+// ACTION:   button_question
+// RESPONSE: Open a modal view to allow user to ask a question
+app.action('button_question',async({ack, body, client}) =>{
+  // Acknowlege the action request
+  await ack();
+  console.log("Acknowledged")
   try {
-    // open modal view from views
+    // Open "question" modal from views.js
     const result = await client.views.open({
       trigger_id: body.trigger_id,
-      // past list to question()
-      view: views.question(skillList)
+      view: await views.questionForm()
     });
-
-    console.log(result);
   } catch (error){
     console.error(error);
   }
 });
 
 // when user submit question, read view_submission
-app.view('question',async({ack, body, view, client}) =>{
+app.view('submit_question', async({ack, body, view, client}) => {
   // acknowlege the command request
   await ack();
-  console.log("View Acknowledged");
-
+  console.log("Question Acknowledged");
   try {
 
   } catch (error){
@@ -158,21 +157,41 @@ app.view('question',async({ack, body, view, client}) =>{
   }
 });
 
+app.action('select_topic', async({ ack, body, action, client }) => {
+  await ack();
+  let updated_topics = [];
+  action.selected_options.forEach( function(option) {
+    updated_topics.push(`${option.value}`);
+  });
+  // Get list of Slack IDs associated with the selected topics
+  userList = await data.findUsersByTopics(updated_topics);
+  // Get list of all topics
+  topicList = await data.listTopics();
+  updatedQuestionForm = await views.questionForm();
+  updatedQuestionForm.blocks[2] = await views.selectUsers(userList);
+  await client.views.update({
+    view: updatedQuestionForm,
+    view_id: body.view.id,
+    hash: body.view.hash,
+  });
+});
 
+// app.options('select_user', async({ ack, options, body }) => {
+//   try {
+//     console.log(body);
+//     await ack();
+//     // await ack({
+//     //   option_groups: option_groups
+//     // });
+//   } catch (error) {
+//     console.error(error);
+//   }
+//   });
 
-app.view('modal-intro', async({ ack, body, say, client }) => {
+app.view('modal-newuser', async({ ack, body, say, client }) => {
   console.log(body);
   await ack();
 });
-
-
-
-//app.action('programming_modal', async({}))
-
-// app.view_submission('modal', async({ ack, body, say }) => {
-//   await ack();
-//   console.log(body);
-// });
 
 // STARTS THE APP
 (async () => {

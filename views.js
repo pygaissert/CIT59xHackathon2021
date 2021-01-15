@@ -1,6 +1,17 @@
 // views.js
 // This is a module for creating modal views
 
+const data = require('./data');
+
+const emptyOptionGroup = {
+  label: {
+    type: 'plain_text',
+    text: 'None'
+  }
+}
+
+/* GREETING FOR NEW USER */
+
 const newUserGreeting = function (user) {
   return {
     blocks: [
@@ -38,6 +49,8 @@ const newUserGreeting = function (user) {
   }
 };
 
+/* GREETING FOR EXISTING USER */
+
 const existingUserGreeting = function (user) {
   return {
     blocks: [
@@ -66,7 +79,7 @@ const existingUserGreeting = function (user) {
               "type": "plain_text",
               "text": "Ask a Question"
             },
-            "action_id": "button_ask"
+            "action_id": "button_question"
           }
         ]
       }
@@ -75,136 +88,13 @@ const existingUserGreeting = function (user) {
   }
 };
 
+/* NEW USER FORM */
 
-// function to show question view
-const question = function (skillList, userList) {
-  return{
-        type: "modal",
-        callback_id: "question",
-      	title: {
-      		type: "plain_text",
-      		text: "Ask a question:",
-      		emoji: true
-      	},
-      	submit: {
-      		type: "plain_text",
-      		text: "Submit",
-      		emoji: true
-      	},
-      	close: {
-      		type: "plain_text",
-      		text: "Cancel",
-      		emoji: true
-      	},
-      	blocks: [
-      		{
-      			type: "input",
-      			element: {
-      				type: "plain_text_input",
-      				multiline: true,
-      				action_id: "plain_text_input-action",
-      				placeholder: {
-      					type: "plain_text",
-      					text: "Example: What is the best language to learn for Data jobs?"
-      				}
-      			},
-      			label: {
-      				type: "plain_text",
-      				text: "Ask a question:",
-      				emoji: true
-      			}
-      		},
-      		{
-      			type: "section",
-      			block_id: "section678",
-      			text: {
-      				type: "mrkdwn",
-      				text: "Select related topic"
-      			},
-      			accessory: {
-      				action_id: "skill_get",
-      				type: "multi_static_select",
-      				placeholder: {
-      					type: "plain_text",
-      					text: "Select question related skills"
-      				},
-      				option_groups: skillList
-      			}
-      		},
-      		{
-      			type: "input",
-      			element: {
-      				type: "multi_users_select",
-      				placeholder: {
-      					type: "plain_text",
-      					text: "Select people to ask this question to:",
-      					emoji: true
-      				},
-      				action_id: "multi_users_select-action",
-              initial_users: ["U01JNHU7S4T","U01JMNX5NSF"]
-      			},
-      			label: {
-      				type: "plain_text",
-      				text: "Optional: add preference",
-      				emoji: true
-      			}
-      		},
-
-      	],
-        submit: {
-          type: 'plain_text',
-          text: 'Submit'
-        }
-  }
-}
-
-const test = {
-  type: 'modal',
-  callback_id: 'view_1',
-  title: {
-    type: 'plain_text',
-    text: 'Modal title'
-  },
-  blocks: [
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: 'Welcome to a modal with _blocks_'
-      },
-      accessory: {
-        type: 'button',
-        text: {
-          type: 'plain_text',
-          text: 'Click Me!'
-        },
-        action_id: 'button_abc'
-      }
-    },
-    {
-      type: 'input',
-      block_id: 'input_c',
-      label: {
-        type: 'plain_text',
-        text: 'What are your hopes and dreams?'
-      },
-      element: {
-        type: 'plain_text_input',
-        action_id: 'dreamy_input',
-        multiline: true
-      }
-    }
-  ],
-  submit: {
-    type:'plain_text',
-    text: 'Submit'
-  }
-};
-
-const newUserInformation = function (list) {
+const newUserInformation = async function () {
+  topicList = await data.listTopics();
   return {
     type: "modal",
-    callback_id: "modal-intro",
+    callback_id: "modal-newuser",
     title: {
       type: "plain_text",
       text: "Elicit",
@@ -245,45 +135,45 @@ const newUserInformation = function (list) {
             {
               text: {
                 type: "plain_text",
-                text: "first year",
+                text: "First Year",
                 //emoji: true
               },
-              value: "first year"
+              value: "First Year"
             },
             {
               text: {
                 type: "plain_text",
-                text: "second year",
+                text: "Second Year",
                 //emoji: true
               },
-              value: "second year"
+              value: "Second Year"
             },
             {
               text: {
                 type: "plain_text",
-                text: "submatriculate",
+                text: "Submatriculate",
                 //emoji: true
               },
-              value: "submatriculate"
+              value: "Submatriculate"
             },
             {
               text: {
                 type: "plain_text",
-                text: "part-time",
+                text: "Part-Time",
                 //emoji: true
               },
-              value: "part-time"
+              value: "Part-Time"
             },
             {
               text: {
                 type: "plain_text",
-                text: "alumni",
+                text: "Alum",
                 //emoji: true
               },
-              value: "alumni"
+              value: "Alum"
             }
           ],
-          action_id: "static_select-action"
+          action_id: "select_year"
         }
       },
       {
@@ -294,13 +184,13 @@ const newUserInformation = function (list) {
           text: "List your skills of expertise"
         },
         accessory: {
-          action_id: "topics",
+          action_id: "select_topics_newuser",
           type: "multi_static_select",
           placeholder: {
             type: "plain_text",
             text: "Programming Languages, data visualization,..."
           },
-          option_groups: list
+          option_groups: topicList
         }
       },
       {
@@ -327,6 +217,8 @@ const newUserInformation = function (list) {
     ]
   }
 };
+
+/* ADDING NEW SKILLS */
 
 const addSkill = function (){
   return {
@@ -384,12 +276,142 @@ const addSkill = function (){
   }
 };
 
+/* QUESTION FORM */
+
+const questionForm = async function () {
+  topicList = await data.listTopics();
+  return{
+        type: "modal",
+        callback_id: "submit_question",
+      	title: {
+      		type: "plain_text",
+      		text: "Ask a question:",
+      		emoji: true
+      	},
+      	submit: {
+      		type: "plain_text",
+      		text: "Submit",
+      		emoji: true
+      	},
+      	close: {
+      		type: "plain_text",
+      		text: "Cancel",
+      		emoji: true
+      	},
+      	blocks: [
+      		{
+      			type: "input",
+      			element: {
+      				type: "plain_text_input",
+      				multiline: true,
+      				action_id: "plain_text_input-action",
+      				placeholder: {
+      					type: "plain_text",
+      					text: "Example: What is the best language to learn for Data jobs?"
+      				}
+      			},
+      			label: {
+      				type: "plain_text",
+      				text: "Ask a question:",
+      				emoji: true
+      			}
+      		},
+      		{
+      			type: "section",
+      			block_id: "section678",
+      			text: {
+      				type: "mrkdwn",
+      				text: "Select related topic"
+      			},
+      			accessory: {
+      				action_id: "select_topic",
+      				type: "multi_static_select",
+      				placeholder: {
+      					type: "plain_text",
+      					text: "Select question related skills"
+      				},
+              option_groups: topicList
+      			},
+      		},
+          {
+            type: "section",
+            block_id: "section789",
+            text: {
+              type: "mrkdwn",
+              text: " "
+            }
+          }
+          // {
+          //   type: "section",
+          //   block_id: "section789",
+          //   text: {
+          //     type: "mrkdwn",
+          //     text: "Select classmates (optional)"
+          //   },
+          //   accessory: {
+          //     action_id: "select_user",
+          //     type: "multi_external_select",
+          //     placeholder: {
+          //       type: "plain_text",
+          //       text: "Select here"
+          //     },
+          //     min_query_length: 0
+          //   }
+          // }
+      		// {
+      		// 	type: "input",
+      		// 	element: {
+      		// 		type: "multi_users_select",
+      		// 		placeholder: {
+      		// 			type: "plain_text",
+      		// 			text: "Select people to ask this question to:",
+      		// 			emoji: true
+      		// 		},
+      		// 		action_id: "multi_users_select-action"
+      		// 	},
+      		// 	label: {
+      		// 		type: "plain_text",
+      		// 		text: "Select classmates (optional)",
+      		// 		emoji: true
+      		// 	}
+      		// },
+
+      	],
+        submit: {
+          type: 'plain_text',
+          text: 'Submit'
+        }
+  }
+}
+
+/* ADDITIONAL BLOCK FOR SELECTING USERS */
+
+const selectUsers = function(userList) {
+  return {
+    type: "section",
+    block_id: "section789",
+    text: {
+      type: "mrkdwn",
+      text: "Select classmates (optional)"
+    },
+    accessory: {
+      action_id: "select_user",
+      type: "multi_static_select",
+      placeholder: {
+        type: "plain_text",
+        text: "Select here"
+      },
+      option_groups: userList
+    }
+  };
+}
+
+
 module.exports = {
-  // Template modal from Slack's website
-  test: test,
   newUserGreeting: newUserGreeting,
   existingUserGreeting: existingUserGreeting,
-  question: question,
+  questionForm: questionForm,
+  selectUsers: selectUsers,
   newUserInformation: newUserInformation,
   addSkill: addSkill
 }
