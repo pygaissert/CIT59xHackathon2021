@@ -76,7 +76,7 @@ app.action('button_no', async({ ack, body, say }) => {
 });
 
 // Show modal to collect user information
-app.action('button_createProfile', async({ ack, body, say, client }) => {
+app.action('button_createProfile', async({ ack, message, body, say, client }) => {
   await ack();
   console.log(body.trigger_id);
   let list = await data.listSkills();
@@ -85,9 +85,11 @@ app.action('button_createProfile', async({ ack, body, say, client }) => {
     const result = await client.views.open({
       // Pass a valid trigger_id within 3 seconds of receiving it
       trigger_id: body.trigger_id,
+      // Pass a valid view_id
       // View payload
       view: views.newUserInformation(list)
     });
+    console.log(result);
   } catch (error) {
     console.error(error);
   }
@@ -95,9 +97,6 @@ app.action('button_createProfile', async({ ack, body, say, client }) => {
 
 // Acknowledge academic year selection
 app.action('static_select-action', async({ ack, body, say, client }) => {
-  // save result of selected option
-  // const val = JSON.stringify(body['actions'][0]);
-  // confirm value on console
   // print out selected academic year value
   //console.log(body.actions[0].selected_option.text.text);
   // Acknowledge static_select
@@ -107,7 +106,7 @@ app.action('static_select-action', async({ ack, body, say, client }) => {
 // Acknowledge multi-seelct skills
 app.action('select_skill', async({ ack, body, say, client }) => {
   // print out info
-  //console.log(body.actions[0].selected_options[0]);
+  console.log(body.actions.selected_options);
   // Acknowledge selection of skill
   await ack();
 });
@@ -154,26 +153,40 @@ app.view('modal-intro', async({ ack, view, body, say, client }) => {
   }
   // print out selected skills on console
   console.log(skills);
-
-  //SORT SKILL LIST?????
-
   // Acknowledge submission of modal
   await ack();
   try {
     await data.addUser(body.user.name, body.user.id, year, skills);
+    await client.chat.update({
+      channel: body.channel.id,
+      ts: body.container.message_ts,
+      blocks: [
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: "Profile successfully added to database!"
+          },
+        }
+      ]
+    });
+    // await client.chat.update({
+    //   channel: body.channel.id,
+    //   ts: body.container.message_ts,
+    //   blocks: views.existingUserGreeting(message.user)
+    // })
   } catch (error) {
     console.log(error);
   }
-  // await say("Profile added to database!")
 });
 
 // Submission of introduction's stacked add modal view
 app.view('NewSkill', async({ ack, view, body, say, client }) => {
   //print group value
-  let topic = view.state.values.add_new_topic.add_Topic.value;
+  topic = view.state.values.add_new_topic.add_Topic.value;
   console.log(topic);
   // print skill value
-  let skill = view.state.values.add_new_skill.add_Skill.value;
+  skill = view.state.values.add_new_skill.add_Skill.value;
   console.log(skill);
   await ack();
   // Add to MongoDB database
