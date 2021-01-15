@@ -276,6 +276,7 @@ const addSkill = function (){
   }
 };
 
+
 /* QUESTION FORM */
 
 const questionForm = async function () {
@@ -407,11 +408,141 @@ const selectUsers = function(userList) {
 }
 
 
+
+
+
+// basic fucntions
+
+const homepage = function (event){
+  return {
+    "type": "home",
+  	"blocks": [
+  		{
+  			"type": "section",
+  			"text": {
+  				"type": "mrkdwn",
+  				"text": "Have you ever been stuck on a project, but you didn't know where to look for help ??? :raising_hand:\n"
+  			}
+  		},
+  		{
+  			"type": "header",
+  			"text": {
+  				"type": "plain_text",
+  				"text": "Introducing Elicit - 100% THAT app you've been looking for! :wink:",
+  				"emoji": true
+  			}
+  		},
+  		{
+  			"type": "section",
+  			"text": {
+  				"type": "plain_text",
+  				"text": " ",
+  				"emoji": true
+  			}
+  		},
+  		{
+  			"type": "divider"
+  		},
+  		{
+  			"type": "section",
+  			"text": {
+  				"type": "mrkdwn",
+  				"text": "*What is Elicit?*\n-\t   Elicit harness the collective skills and experiences of the MCIT student body so that no problem will ever go unsolved.\t\t"
+  			}
+  		},
+  		{
+  			"type": "section",
+  			"text": {
+  				"type": "mrkdwn",
+  				"text": "-\t   Whenever you have a burning question about JavaScript :jigsaw:, Machine Learning :robot_face: , Graphic Design :art: , the healthcare industry :hospital: , editing a cover letter :memo: , or even general organization techniques :busts_in_silhouette: , Elicit will help direct your question to one of your many benevolent classmates."
+  			},
+  			"accessory": {
+  				"type": "image",
+  				"image_url": "https://memegenerator.net/img/images/4637859/spongebob-rainbow.jpg",
+  				"alt_text": "alt text for image"
+  			}
+  		},
+  		{
+  			"type": "section",
+  			"text": {
+  				"type": "plain_text",
+  				"text": " ",
+  				"emoji": true
+  			}
+  		},
+  		{
+  			"type": "divider"
+  		},
+  		{
+  			"type": "section",
+  			"text": {
+  				"type": "mrkdwn",
+  				"text": "*How to use Elicit?*\n\n\t\t:zero:  (Each time) start the app by saying \"Hello\", or type our slash-commands (ex. /ask-question) :wave:\n\n\t\t:one:  Opt-in Elcit  :white_check_mark:  and add your profile :bust_in_silhouette:\n\n\t\t:two:  Ask a question:question:\n\n\t\t:three:  Choose a classmate :nerd_face: to pose the question to :outbox_tray: \n\n\t\t:four:  Start conversation with the classmate :handshake: \n\n\t\t:five:  Update your profile when you learn new skills :technologist:"
+  			}
+  		},
+  		{
+  			"type": "section",
+  			"text": {
+  				"type": "plain_text",
+  				"text": " ",
+  				"emoji": true
+  			}
+  		},
+  		{
+  			"type": "divider"
+  		},
+  		{
+  			"type": "section",
+  			"text": {
+  				"type": "mrkdwn",
+  				"text": "*About Elicit:*\n\n Elicit is a student project at the CIT59x 2021 winter hackathon. Driven by the hope to better connect and foster the MCIT student community, the Elicit team hope to create application that facilitates and encourages students to be each other's greatest allies."
+  			}
+  		},
+  		{
+  			"type": "actions",
+  			"elements": [
+  				{
+  					"type": "button",
+  					"text": {
+  						"type": "plain_text",
+  						"text": "Visit our Git project page",
+  						"emoji": true
+  					},
+  					"value": "git_repo_button",
+  					"url": "https://github.com/pygaissert/CIT59xHackathon2021"
+  				}
+  			]
+  		},
+  		{
+  			"type": "divider"
+  		},
+  		{
+  			"type": "section",
+  			"text": {
+  				"type": "mrkdwn",
+  				"text": "*Meet the team:*\n\n Philipp Gaissert, Jintong Wu, Dana Yang"
+  			}
+  		}
+  	]
+  }
+};
+
+
+// return a modal view of existing users profiles
+const listProfiles = function() {
+
+}
+
+
+
+
 module.exports = {
   newUserGreeting: newUserGreeting,
   existingUserGreeting: existingUserGreeting,
   questionForm: questionForm,
   selectUsers: selectUsers,
   newUserInformation: newUserInformation,
-  addSkill: addSkill
+  addSkill: addSkill,
+  homepage: homepage,
+  listProfiles: listProfiles
 }

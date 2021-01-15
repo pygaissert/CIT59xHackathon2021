@@ -193,6 +193,95 @@ app.view('modal-newuser', async({ ack, body, say, client }) => {
   await ack();
 });
 
+
+
+//app.action('programming_modal', async({}))
+
+// app.view_submission('modal', async({ ack, body, say }) => {
+//   await ack();
+//   console.log(body);
+// });
+
+
+// adding some basic function below:
+
+// app homepage
+app.event('app_home_opened', async({ event, client }) =>{
+
+  console.log("home opened!!!!!");
+  try{
+    // publish home page when user click home
+    const result = await client.views.publish({
+        user_id: event.user,
+        view: await views.homepage(event)
+    });
+    console.log(result);
+  } catch (error){
+    console.error(error);
+  }
+});
+
+
+//// app_command
+// create_profile
+app.command('/create-profile', async ({ command, ack, say, body, client}) => {
+  await ack();
+  console.log("User wants to create profile ");
+  // add function
+});
+// edit_profile
+app.command('/edit-profile', async ({ command, ack, say, body, client}) => {
+  // acknowlege the command request
+  console.log("User wants to edit profile ");
+  // add function
+});
+// ask_question
+app.command('/ask-question', async ({ command, ack, say, body, client}) => {
+  // acknowlege the command request
+  await ack();
+  console.log("User wants to ask question ");
+  // add function
+});
+
+// view_people
+app.command('/view-people', async ({ command, ack, say, body, client}) => {
+  // acknowlege the command request
+  await ack();
+  console.log("User wants to view other people's profiles ");
+  try {
+    // open modal view from views, list all people currently in the db
+    const result = await client.views.open({
+      trigger_id: body.trigger_id,
+      view: views.list_profiles()
+    });
+
+    console.log(result);
+  } catch (error){
+    console.error(error);
+  }
+});
+// my_profile
+app.command('/my-profile', async ({ command, ack, say, body, client}) => {
+  // acknowlege the command request
+  await ack();
+  console.log(`User: ${command.user_id} wants to view their profile `);
+
+  // try {
+  //   // open modal view from views, show user's own profile
+  //   const result = await client.views.open({
+  //     trigger_id: body.trigger_id,
+  //     view: views.list_profiles()
+  //   });
+  //
+  //   console.log(result);
+  // } catch (error){
+  //   console.error(error);
+  // }
+});
+
+
+
+
 // STARTS THE APP
 (async () => {
   await app.start(port);
