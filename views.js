@@ -308,10 +308,11 @@ const questionForm = async function () {
       	blocks: [
       		{
       			type: "input",
+            block_id: "input_question",
       			element: {
       				type: "plain_text_input",
       				multiline: true,
-      				action_id: "plain_text_input-action",
+      				action_id: "input_question",
       				placeholder: {
       					type: "plain_text",
       					text: "Example: What is the best language to learn for Data jobs?"
@@ -325,13 +326,13 @@ const questionForm = async function () {
       		},
       		{
       			type: "section",
-      			block_id: "section678",
+      			block_id: "select_topics_question",
       			text: {
       				type: "mrkdwn",
       				text: "Select related topic"
       			},
       			accessory: {
-      				action_id: "select_topic",
+      				action_id: "select_topics_question",
       				type: "multi_static_select",
       				placeholder: {
       					type: "plain_text",
@@ -340,14 +341,7 @@ const questionForm = async function () {
               option_groups: topicList
       			},
       		},
-          {
-            type: "section",
-            block_id: "section789",
-            text: {
-              type: "mrkdwn",
-              text: " "
-            }
-          }
+          noTopicsSelected,
           // {
           //   type: "section",
           //   block_id: "section789",
@@ -391,18 +385,42 @@ const questionForm = async function () {
   }
 }
 
-/* ADDITIONAL BLOCK FOR SELECTING USERS */
+/* ADDITIONAL BLOCKS FOR SELECTING USERS */
 
-const selectUsers = function(userList) {
+const noTopicsSelected = {
+  type: "section",
+  block_id: "select_users_question",
+  text: {
+    type: "mrkdwn",
+    text: " "
+  },
+}
+
+const noUsersFound = function(empty_groups){
+  let list = "";
+  for (group of empty_groups) {
+    list += `\n- ${group}`;
+  }
   return {
     type: "section",
-    block_id: "section789",
+    block_id: "select_users_question",
     text: {
       type: "mrkdwn",
+      text: `We could not find classmates for the following topics:${list}`
+    },
+  }
+}
+
+const usersSelected = function(userList) {
+  return {
+    type: "section",
+    block_id: "select_users_question",
+    text: {
+      type: "plain_text",
       text: "Select classmates (optional)"
     },
     accessory: {
-      action_id: "select_user",
+      action_id: "select_users_question",
       type: "multi_static_select",
       placeholder: {
         type: "plain_text",
@@ -543,12 +561,14 @@ const listProfiles = function() {
 
 
 module.exports = {
+  homepage: homepage,
   newUserGreeting: newUserGreeting,
-  existingUserGreeting: existingUserGreeting,
-  questionForm: questionForm,
-  selectUsers: selectUsers,
   newUserInformation: newUserInformation,
   addSkill: addSkill,
-  homepage: homepage,
-  listProfiles: listProfiles
+  existingUserGreeting: existingUserGreeting,
+  listProfiles: listProfiles,
+  questionForm: questionForm,
+  usersSelected: usersSelected,
+  noUsersFound: noUsersFound,
+  noTopicsSelected: noTopicsSelected
 }

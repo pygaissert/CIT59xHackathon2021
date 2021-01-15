@@ -240,17 +240,19 @@ const findUsersByTopics = async function(topics) {
             text: `${doc.user}`
           },
           value: `${doc.user}`
-      }
-    );
+        }
+      );
     });
-    topic_groups.push(
-      {
-        label: {
-          type: "plain_text",
-          text: topic
-        },
-        "options": users
-    });
+    if (users.length != 0) {
+      topic_groups.push(
+        {
+          label: {
+            type: "plain_text",
+            text: topic
+          },
+          "options": users
+      });
+    }
   }
   return topic_groups;
 }

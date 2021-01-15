@@ -97,7 +97,7 @@ app.action('button_createProfile', async({ ack, body, say, client }) => {
   }
 });
 
-// ACTION:   static_select-action
+// ACTION:   select_year
 // RESPONSE: Acknowledge academic year selection
 app.action('select_year', async({ ack, body, say, client }) => {
   // save result of selected option
@@ -217,7 +217,7 @@ app.view('NewSkill', async({ ack, view, body, say, client }) => {
 app.action('button_question',async({ack, body, client}) =>{
   // Acknowlege the action request
   await ack();
-  console.log("Acknowledged")
+  console.log("Acknowledged - Opening Question Form")
   try {
     // Open "question" modal from views.js
     const result = await client.views.open({
@@ -230,36 +230,119 @@ app.action('button_question',async({ack, body, client}) =>{
 });
 
 // when user submit question, read view_submission
-app.view('submit_question', async({ack, body, view, client}) => {
+app.view('submit_question', async({ ack, body, view, client }) => {
   // acknowlege the command request
   await ack();
-  console.log("Question Acknowledged");
+  console.log("Acknowledged - Question Submitted");
+  submission = parseQuestionSubmission(view, body.user.id);
+  console.log(submission.users);
   try {
-
+    let result = await client.conversations.open({
+      token: slackBotToken,
+      users: submission.users
+    });
+    let msg = await client.chat.postMessage({
+      token: slackBotToken,
+      channel: result.channel.id,
+      text: `<@${body.user.id}> has a question for you!`,
+      attachments: [
+        {
+          color: "#36a64f",
+          fields: [
+            {
+              title: "Topic(s)",
+              value: submission.topics
+            },
+            {
+              title: "Question",
+              value: submission.question
+            }
+          ]
+        }
+      ]
+    });
   } catch (error){
     console.error(error);
   }
 });
 
-app.action('select_topic', async({ ack, body, action, client }) => {
+app.action('select_topics_question', async({ ack, body, action, client }) => {
   await ack();
-  let updated_topics = [];
-  action.selected_options.forEach( function(option) {
-    updated_topics.push(`${option.value}`);
-  });
-  // Get list of Slack IDs associated with the selected topics
-  userList = await data.findUsersByTopics(updated_topics);
-  // Get list of all topics
-  topicList = await data.listTopics();
+  console.log("Acknowledged - Topic Selected");
+  // Create a new identical question form view
   updatedQuestionForm = await views.questionForm();
-  updatedQuestionForm.blocks[2] = await views.selectUsers(userList);
-  await client.views.update({
-    view: updatedQuestionForm,
-    view_id: body.view.id,
-    hash: body.view.hash,
-  });
+  // Check if there are topics selected
+  if (action.selected_options.length == 0) {
+    updatedQuestionForm.blocks[2] = views.noTopicsSelected;
+  } else {
+    let updated_topics = getValuesFromOptions(action.selected_options);
+    // Get list of Slack IDs associated with the selected topics
+    userList = await data.findUsersByTopics(updated_topics);
+    // Check for empty topic groups
+    if (userList.length == 0) {
+      updatedQuestionForm.blocks[2] = await views.noUsersFound(updated_topics);
+    } else {
+      updatedQuestionForm.blocks[2] = await views.usersSelected(userList);
+    }
+  }
+  try {
+    await client.views.update({
+      view: updatedQuestionForm,
+      view_id: body.view.id,
+      hash: body.view.hash,
+    });
+  } catch (error) {
+    console.log(error);
+  }
 });
 
+app.action('select_users_question', async({ack}) => {
+  await ack();
+  console.log("Acknowledged - User Selected")
+})
+
+const getValuesFromOptions = function(options) {
+  let values = [];
+  options.forEach( function(option) {
+    values.push(`${option.value}`);
+  });
+  return values;
+}
+
+const prepareBotMessage = function(user, topics) {
+  topicsString = topics[topics.length - 1];
+  if (topics.length > 1) {
+    topics = topics.slice(0, topics.length - 1);
+    topicsString = topics.join(", ") + " and " + topicsString;
+  }
+  return `<@${user}> has a question for you! about ${topicsString}!`;
+}
+
+const parseQuestionSubmission = function(view, user) {
+  topics = getValuesFromOptions(view.state.values.select_topics_question.select_topics_question.selected_options).join(', ');
+  users = getValuesFromOptions(view.state.values.select_users_question.select_users_question.selected_options);
+  if (!users.includes(user)) {
+    users.push(user);
+  }
+  users = users.join(', ');
+  question = view.state.values.input_question.input_question.value;
+
+  return {
+    topics: topics,
+    users: users,
+    question: question
+  }
+}
+
+const isOptionGroupEmpty = function(option_groups) {
+  let empty_groups = [];
+  option_groups.forEach( function(group) {
+    if (group.options.length == 0) {
+      empty_groups.push(group.label.text);
+    }
+  });
+  console.log(empty_groups);
+}
 // app.options('select_user', async({ ack, options, body }) => {
 //   try {
 //     console.log(body);
@@ -299,6 +382,7 @@ app.event('app_home_opened', async({ event, client }) =>{
   }
 });
 
+/* SLASH COMMANDS */
 
 //// app_command
 // create_profile
@@ -356,9 +440,6 @@ app.command('/my-profile', async ({ command, ack, say, body, client}) => {
   //   console.error(error);
   // }
 });
-
-
-
 
 // STARTS THE APP
 (async () => {
