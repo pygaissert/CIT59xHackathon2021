@@ -32,22 +32,35 @@ app.message('hello', async ({ message, say }) => {
   await say(`Hey there <@${message.user}>!`);
 });
 
-// MAIN FUNCTION FOR INITIALIZING THE SLACKBOT
-async function main(){
-	try {
-    await app.say(`Hello there! To participate, reply with _yes_.`);
-    await app.message('yes', async ({ message, say }) => {
-      await app.say(`To get started, type command "/modal".`);
-    });
-	} catch (e) {
-    		console.error(e);
-  }
-}
+// // MAIN FUNCTION FOR INITIALIZING THE SLACKBOT
+// async function main(){
+// 	try {
+//     await app.say(`Hello there! To participate, reply with _yes_.`);
+//     await app.message('yes', async ({ message, say }) => {
+//       await app.say(`To get started, type command "/modal".`);
+//     });
+// 	} catch (e) {
+//     		console.error(e);
+//   }
+// }
+//
+// // TEST MAIN FUNCTION
+// main().catch(console.error);
+//
 
-// TEST MAIN FUNCTION
-main().catch(console.error);
-
-
+app.command('/start', async({ command, ack, say, client }) => {
+  await ack();
+  let result = await client.conversations.open({
+    token: slackBotToken,
+    users: "U01JMNX5NSF, U01JMNSEL75, U01JEPEGDCN"
+  });
+  console.log(result);
+  let msg = await client.chat.postMessage({
+    token: slackBotToken,
+    channel: result.channel.id,
+    text: "Group message test"
+  });
+});
 
 // TESTS RESPONSE TO '/modal' SLASH COMMAND & CREATING MODAL
 app.command('/modal', async ({ ack, body, client }) => {
