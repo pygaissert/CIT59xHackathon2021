@@ -66,7 +66,7 @@ const listSkills = async function() {
     let option = [];
 
     // find each JSON under group:group, push to option
-    let eachColl = await collection.find({group:group}).forEach( function(item) {
+    let eachColl = await collection.find({group:group}).sort({name: 1}).forEach( function(item) {
       option.push(
         {
           text: {

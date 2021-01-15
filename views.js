@@ -452,7 +452,7 @@ const homepage = function (event){
   			"type": "section",
   			"text": {
   				"type": "mrkdwn",
-  				"text": "*How to use Elicit?*\n\n\t\t:zero:  (Each time) start the app by saying \"Hello\" :wave:\n\n\t\t:one:  Opt-in Elcit  :white_check_mark:  and add your profile :bust_in_silhouette:\n\n\t\t:two:  Ask a question:question:\n\n\t\t:three:  Choose a classmate :nerd_face: to pose the question to :outbox_tray: \n\n\t\t:four:  Start conversation with the classmate :handshake: \n\n\t\t:five:  Update your profile when you learn new skills :technologist:"
+  				"text": "*How to use Elicit?*\n\n\t\t:zero:  (Each time) start the app by saying \"Hello\", or type our slash-commands (ex. /ask-question) :wave:\n\n\t\t:one:  Opt-in Elcit  :white_check_mark:  and add your profile :bust_in_silhouette:\n\n\t\t:two:  Ask a question:question:\n\n\t\t:three:  Choose a classmate :nerd_face: to pose the question to :outbox_tray: \n\n\t\t:four:  Start conversation with the classmate :handshake: \n\n\t\t:five:  Update your profile when you learn new skills :technologist:"
   			}
   		},
   		{
@@ -503,6 +503,13 @@ const homepage = function (event){
 };
 
 
+// return a modal view of existing users profiles
+const listProfiles = function() {
+
+}
+
+
+
 module.exports = {
   // Template modal from Slack's website
   test: test,
@@ -511,5 +518,6 @@ module.exports = {
   question: question,
   newUserInformation: newUserInformation,
   addSkill: addSkill,
-  homepage: homepage
+  homepage: homepage,
+  listProfiles: listProfiles
 }
