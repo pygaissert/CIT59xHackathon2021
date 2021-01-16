@@ -152,11 +152,11 @@ app.action('add_Skill', async({ ack, body, say, client}) => {
 
 // Submission of introduction modal and extraction of data
 app.view('modal-newuser', async({ ack, view, body, say, client }) => {
-  let year = view.state.values.select_year['static_select-action'].selected_option.value;
+  let year = view.state.values.select_year.graduation_year.value;
   // print out selected academic year value
   console.log(year);
   // parse through selected skills
-  let skillList = view.state.values.select_skill.select_skill.selected_options;
+  let skillList = view.state.values.select_skill.select_topics_newuser.selected_options;
   var skills = [];
   for (i = 0; i < skillList.length; i++){
     skills.push(skillList[i].value);
@@ -166,7 +166,14 @@ app.view('modal-newuser', async({ ack, view, body, say, client }) => {
   // Acknowledge submission of modal
   await ack();
   try {
-    await data.addUser(body.user.name, body.user.id, year, skills);
+    // add user name, id, and graduation year to users collection
+    await data.addUser(body.user.name, body.user.id, year);
+    // add user and skills to topics-user collection
+
+
+
+
+
     await client.chat.update({
       channel: body.channel.id,
       ts: body.container.message_ts,

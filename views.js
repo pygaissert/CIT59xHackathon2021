@@ -122,6 +122,7 @@ const newUserInformation = async function () {
       // Static select button for student status
       {
         type: "input",
+        block_id: "select_year",
         element: {
           type: "plain_text_input",
           action_id: "graduation_year",
