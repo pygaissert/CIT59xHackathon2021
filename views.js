@@ -91,10 +91,11 @@ const existingUserGreeting = function (user) {
 
 /* NEW USER FORM */
 
-const newUserInformation = async function () {
+const newUserInformation = async function (channel, timestamp) {
   topicList = await data.listTopics();
   return {
     type: "modal",
+    private_metadata: `${channel}_${timestamp}`,
     callback_id: "modal-newuser",
     title: {
       type: "plain_text",
@@ -140,7 +141,7 @@ const newUserInformation = async function () {
       // List skills from a external multi-select
       {
         type: "section",
-        block_id: "select_skill",
+        block_id: "select_topics_newuser",
         text: {
           type: "mrkdwn",
           text: "List your skills of expertise"
@@ -180,7 +181,7 @@ const newUserInformation = async function () {
   }
 };
 
-/* ADDING NEW SKILLS */
+/* ADDING NEW SKILLS TO ELICIT */
 
 const addSkill = async function (hash, skillList) {
   let topicList = await data.listGroups();
@@ -304,10 +305,11 @@ const questionForm = async function () {
       	blocks: [
       		{
       			type: "input",
+            block_id: "input_question",
       			element: {
       				type: "plain_text_input",
       				multiline: true,
-      				action_id: "plain_text_input-action",
+      				action_id: "input_question",
       				placeholder: {
       					type: "plain_text",
       					text: "Example: What is the best language to learn for Data jobs?"
@@ -321,29 +323,22 @@ const questionForm = async function () {
       		},
       		{
       			type: "section",
-      			block_id: "section678",
+      			block_id: "select_topics_question",
       			text: {
       				type: "mrkdwn",
-      				text: "Select related topic"
+      				text: "Select related topic(s)"
       			},
       			accessory: {
-      				action_id: "select_topic",
+      				action_id: "select_topics_question",
       				type: "multi_static_select",
       				placeholder: {
       					type: "plain_text",
-      					text: "Select question related skills"
+      					text: "No topics selected"
       				},
               option_groups: topicList
       			},
       		},
-          {
-            type: "section",
-            block_id: "section789",
-            text: {
-              type: "mrkdwn",
-              text: " "
-            }
-          }
+          noTopicsSelected,
           // {
           //   type: "section",
           //   block_id: "section789",
@@ -387,22 +382,46 @@ const questionForm = async function () {
   }
 }
 
-/* ADDITIONAL BLOCK FOR SELECTING USERS */
+/* ADDITIONAL BLOCKS FOR SELECTING USERS */
 
-const selectUsers = function(userList) {
+const noTopicsSelected = {
+  type: "section",
+  block_id: "select_users_question",
+  text: {
+    type: "mrkdwn",
+    text: " "
+  },
+}
+
+const noUsersFound = function(empty_groups){
+  let list = "";
+  for (group of empty_groups) {
+    list += `\n- ${group}`;
+  }
   return {
     type: "section",
-    block_id: "section789",
+    block_id: "select_users_question",
     text: {
       type: "mrkdwn",
-      text: "Select classmates (optional)"
+      text: `We could not find classmates for the following topics:${list}`
+    },
+  }
+}
+
+const usersSelected = function(userList) {
+  return {
+    type: "section",
+    block_id: "select_users_question",
+    text: {
+      type: "plain_text",
+      text: "Optional: Select classmate(s)"
     },
     accessory: {
-      action_id: "select_user",
+      action_id: "select_users_question",
       type: "multi_static_select",
       placeholder: {
         type: "plain_text",
-        text: "Select here"
+        text: "No classmates selected"
       },
       option_groups: userList
     }
@@ -845,16 +864,21 @@ const showAllProfiles = async function() {
 
 
 module.exports = {
+  homepage: homepage,
   newUserGreeting: newUserGreeting,
-  existingUserGreeting: existingUserGreeting,
-  questionForm: questionForm,
-  selectUsers: selectUsers,
   newUserInformation: newUserInformation,
   addSkill: addSkill,
+
   homepage: homepage,
   showUserProfile: showUserProfile,
   showAllProfiles:showAllProfiles,
   listProfiles: listProfiles,
   clearSkillList: clearSkillList,
-  updateSkillList: updateSkillList
+  updateSkillList: updateSkillList,
+  existingUserGreeting: existingUserGreeting,
+  questionForm: questionForm,
+  usersSelected: usersSelected,
+  noUsersFound: noUsersFound,
+  noTopicsSelected: noTopicsSelected
+
 }

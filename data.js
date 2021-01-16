@@ -187,78 +187,9 @@ const listTopics = async function() {
       });
     }
 
-      //   option_groups.push(
-      //       {
-      //         text: {
-      //           type: 'plain_text',
-      //           text: item.name
-      //         },
-      //         value: item.name // MAYBE CHANGE THIS to option_groups
-      //       });
-      // });
-      // console.log( option_groups );
-
-
-      // FIX THIS
-      // Get array of skill groups from "skills" collection
-      // groups = await collection.find({});
-      //
-      // // Get array of skills from "skills" collection
-      // // skills = await collection.find({}).sort({group: 1, name: 1}).toArray();
-      // // Initialize an empty options array for the dropdown menu
-      // let option_groups = [];
-      // // Add each skill's name to the options array
-      // for (group of groups) {
-      //   // let options = [];
-      //   let skills = await collection.find({group: group}).sort({name: 1}).toArray();
-      //   for (skill of skills) {
-      //     console.log(skill.name);
-      //
-      //
-      //     option_groups.push(
-      //       {
-      //       text: {
-      //         type: 'plain_text',
-      //         text: skill.name
-      //       },
-      //       value: "value-0"
-      //     });
-      //   }
-      //   // option_groups.push({
-      //   //   label: {
-      //   //     type: 'plain_text',
-      //   //     text: group
-      //   //   },
-      //   //   options: options
-      //   // });
-      // }
-
-      // let alt = [        {
-      //           text: {
-      //             type: "plain_text",
-      //             text: "Java"
-      //           },
-      //           value: "value-0"
-      //         },
-      //         {
-      //           text: {
-      //             type: "plain_text",
-      //             text: "Python"
-      //           },
-      //           value: "value-1"
-      //         },
-      //         {
-      //           text: {
-      //             type: "plain_text",
-      //             text: "Data Visualization"
-      //           },
-      //           value: "value-2"
-      //         }]
-
 
   return option_groups;
 }
-
 
 const listUsers = async function() {
   // Create new MongoDB client
@@ -317,17 +248,19 @@ const findUsersByTopics = async function(topics) {
             text: `${doc.user}`
           },
           value: `${doc.user}`
-      }
-    );
+        }
+      );
     });
-    topic_groups.push(
-      {
-        label: {
-          type: "plain_text",
-          text: topic
-        },
-        "options": users
-    });
+    if (users.length != 0) {
+      topic_groups.push(
+        {
+          label: {
+            type: "plain_text",
+            text: topic
+          },
+          "options": users
+      });
+    }
   }
   return topic_groups;
 }
