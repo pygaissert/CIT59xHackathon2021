@@ -257,7 +257,7 @@ const findUsersByTopics = async function(topics) {
 
 
 // function to to get user profile in array, by user id
-// TODO: change filter when database is implemented
+// TODO: change user_id formated string when database is implemented
 const getProfileById = async function(user_id){
 
   // return values: two strings, year and expertise
@@ -294,7 +294,7 @@ const getProfileById = async function(user_id){
 }
 
 // function to to get all user profile in 2D array
-// TODO: change filter when database is implemented
+// TODO: change user_id formated string when database is implemented
 const getAllProfile = async function(){
 
   // return values, 2D arrays,

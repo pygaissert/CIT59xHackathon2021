@@ -303,12 +303,6 @@ app.event('app_home_opened', async({ event, client }) =>{
 //// app_command
 
 // implement these when above functions are finished
-// create_profile
-app.command('/create-profile', async ({ command, ack, say, body, client}) => {
-  await ack();
-  console.log("User wants to create profile ");
-  // add function
-});
 // edit_profile
 app.command('/edit-profile', async ({ command, ack, say, body, client}) => {
   // acknowlege the command request
@@ -345,6 +339,19 @@ app.command('/my-profile', async ({ command, ack, say, body, client}) => {
   await ack();
 
   try {
+  //   await say({
+  //     "blocks": [
+  //     {
+  //       "type": "header",
+  //       "text": {
+  //         "type": "plain_text",
+  //         "text": "This is a header block",
+  //         "emoji": true
+  //       }
+  //     }
+  //   ]
+  // });
+
     // write new message, show user's own profile
     const result = await say(
       // change this

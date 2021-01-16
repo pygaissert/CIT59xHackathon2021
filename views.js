@@ -427,6 +427,22 @@ const homepage = function (event){
   				"text": "Have you ever been stuck on a project, but you didn't know where to look for help ??? :raising_hand:\n"
   			}
   		},
+      {
+      	"type": "section",
+      	"text": {
+      		"type": "plain_text",
+      		"text": " ",
+      		"emoji": true
+      	}
+      },
+      {
+        "type": "section",
+        "text": {
+          "type": "plain_text",
+          "text": " ",
+          "emoji": true
+        }
+      },
   		{
   			"type": "header",
   			"text": {
@@ -435,22 +451,30 @@ const homepage = function (event){
   				"emoji": true
   			}
   		},
-  		{
-  			"type": "section",
-  			"text": {
-  				"type": "plain_text",
-  				"text": " ",
-  				"emoji": true
-  			}
-  		},
+  		// {
+  		// 	"type": "section",
+  		// 	"text": {
+  		// 		"type": "plain_text",
+  		// 		"text": " ",
+  		// 		"emoji": true
+  		// 	}
+  		// },
   		{
   			"type": "divider"
   		},
+      {
+        "type": "header",
+        "text": {
+          "type": "plain_text",
+          "text": "What is Elicit?",
+          "emoji": true
+        }
+      },
   		{
   			"type": "section",
   			"text": {
   				"type": "mrkdwn",
-  				"text": "*What is Elicit?*\n-\t   Elicit harness the collective skills and experiences of the MCIT student body so that no problem will ever go unsolved.\t\t"
+  				"text": "-\t   Elicit harness the collective skills and experiences of the MCIT student body so that no problem will ever go unsolved.\t\t"
   			}
   		},
   		{
@@ -465,32 +489,40 @@ const homepage = function (event){
   				"alt_text": "spongebob_rainbow"
   			}
   		},
-  		{
-  			"type": "section",
-  			"text": {
-  				"type": "plain_text",
-  				"text": " ",
-  				"emoji": true
-  			}
-  		},
+  		// {
+  		// 	"type": "section",
+  		// 	"text": {
+  		// 		"type": "plain_text",
+  		// 		"text": " ",
+  		// 		"emoji": true
+  		// 	}
+  		// },
   		{
   			"type": "divider"
   		},
+      {
+        "type": "header",
+        "text": {
+          "type": "plain_text",
+          "text": "How to use Elicit?",
+          "emoji": true
+        }
+      },
   		{
   			"type": "section",
   			"text": {
   				"type": "mrkdwn",
-  				"text": "*How to use Elicit?*\n\n\t\t:zero:  (Each time) start the app by saying \"Hello\", or type our slash-commands (ex. /ask-question) :wave:\n\n\t\t:one:  Opt-in Elcit  :white_check_mark:  and add your profile :bust_in_silhouette:\n\n\t\t:two:  Ask a question:question:\n\n\t\t:three:  Choose a classmate :nerd_face: to pose the question to :outbox_tray: \n\n\t\t:four:  Start conversation with the classmate :handshake: \n\n\t\t:five:  Update your profile when you learn new skills :technologist:"
+  				"text": "-   \t:zero:  (Each time) start the app by saying \"Hello\"  :wave:\n\n-   \t:one:  Opt-in Elcit  :white_check_mark:  and add your profile :bust_in_silhouette:\n\n-   \t:two:  Ask a question:question:\n\n-   \t:three:  Choose a classmate :nerd_face: to pose the question to :outbox_tray: \n\n-   \t:four:  Start conversation by browsing classmates profiles :handshake: \n\n-   \t:five:  Update your profile when you learn new skills :technologist:\n\n-   \tAlternatively, try our slash-command options by typing \"\\\" in the chat"
   			}
   		},
-  		{
-  			"type": "section",
-  			"text": {
-  				"type": "plain_text",
-  				"text": " ",
-  				"emoji": true
-  			}
-  		},
+  		// {
+  		// 	"type": "section",
+  		// 	"text": {
+  		// 		"type": "plain_text",
+  		// 		"text": " ",
+  		// 		"emoji": true
+  		// 	}
+  		// },
   		{
   			"type": "divider"
   		},
@@ -535,49 +567,111 @@ const homepage = function (event){
 const showUserProfile = async function(user_id) {
   let output = await data.getProfileById(user_id);
 
-  // console.log(output);
-  return {
-    "blocks": [
+  // // console.log(output);
+  // return {
+  //   "blocks": [
+  //     {
+  // 			"type": "header",
+  // 			"text": {
+  // 				"type": "plain_text",
+  // 				"text": "Your Current Elicit Profile:",
+  // 				"emoji": true
+  // 			}
+  // 		},
+  //     {
+  //       "type": "section",
+  //       "text": {
+  //         "type": "mrkdwn",
+  //         // TO-DO <@${user_id}>
+  //         "text": `:bust_in_silhouette:  *Name*: ${user_id}\n\n :mortar_board:  *Graduating Year*: ${output[0]}\n\n :brain:  *Expertise*: ${output[1]}`
+  //       },
+  // 			// "accessory": {
+  // 			// 	"type": "image",
+  // 			// 	"image_url": url,
+  // 			// 	"alt_text": "alt text for image"
+  // 			// }
+  //     },
+  //     {
+  //       "type": "section",
+  //       "text": {
+  //         "type": "plain_text",
+  //         "text": " ",
+  //         "emoji": true
+  //       }
+  //     },
+  //     {
+  //       "type": "actions",
+  //       "elements": [
+  //         {
+  //           "type": "button",
+  //           "text": {
+  //             "type": "plain_text",
+  //             "text": "Edit Your Profile"
+  //           },
+  //           "style": "primary",
+  //           "action_id": "button_edit"
+  //         }
+  //       ]
+  //     }
+  //   ]
+  // }
+
+
+  return{
+    "attachments": [
       {
-  			"type": "header",
-  			"text": {
-  				"type": "plain_text",
-  				"text": "Your Current Elicit Profile:",
-  				"emoji": true
-  			}
-  		},
-      {
-        "type": "section",
-        "text": {
-          "type": "mrkdwn",
-          // TO-DO <@${user_id}>
-          "text": `:bust_in_silhouette:  *Name*: ${user_id}\n\n :mortar_board:  *Graduating Year*: ${output[0]}\n\n :brain:  *Expertise*: ${output[1]}`
-        },
-  			// "accessory": {
-  			// 	"type": "image",
-  			// 	"image_url": url,
-  			// 	"alt_text": "alt text for image"
-  			// }
-      },
-      {
-        "type": "section",
-        "text": {
-          "type": "plain_text",
-          "text": " ",
-          "emoji": true
-        }
-      },
-      {
-        "type": "actions",
-        "elements": [
+        "color": "#f2c744",
+        "blocks": [
           {
-            "type": "button",
+          	"type": "header",
+          	"text": {
+          		"type": "plain_text",
+          		"text": "Your Current Elicit Profile:",
+          		"emoji": true
+          	}
+          },
+          {
+            "type": "section",
             "text": {
               "type": "plain_text",
-              "text": "Edit Your Profile"
+              "text": " ",
+              "emoji": true
+            }
+          },
+          {
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              // TO-DO <@${user_id}>
+              "text": `:bust_in_silhouette:  *Name*: ${user_id}\n\n :mortar_board:  *Graduating Year*: ${output[0]}\n\n :brain:  *Expertise*: ${output[1]}`
             },
-            "style": "primary",
-            "action_id": "button_edit"
+            "accessory": {
+            	"type": "image",
+            	"image_url": "https://static.wikia.nocookie.net/spongebob/images/9/96/The_Two_Faces_of_Squidward_174.png/revision/latest/scale-to-width-down/1000?cb=20200923005328",
+            	"alt_text": "alt text for image"
+            }
+          },
+          {
+            "type": "section",
+            "text": {
+              "type": "plain_text",
+              "text": " ",
+              "emoji": true
+            }
+          },
+          {
+            "type": "actions",
+            "elements": [
+              {
+                "type": "button",
+                "text": {
+                  "type": "plain_text",
+                  "text": "Edit Your Profile"
+                },
+                "style": "primary",
+                "action_id": "button_edit"
+              }
+            ]
           }
         ]
       }
