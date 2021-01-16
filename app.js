@@ -233,7 +233,7 @@ app.view('modal_addskill', async({ ack, view, response, body, say, client }) => 
   //console.log(selected_skill_list);
   try {
     // Add to MongoDB database
-    await data.addSkill(topic, skill);
+    await data.addNewSkill(topic, skill);
     clearNewUserInfo = await views.newUserInformation();
     clearNewUserInfo.blocks[2] = await views.clearSkillList();
     updateNewUserInfo = await views.newUserInformation();
