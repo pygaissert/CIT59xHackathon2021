@@ -48,6 +48,25 @@ const addUser = async function(userName, userId, userYear, userSkills) {
   });
 }
 
+const formatSkillList = async function(list) {
+  console.log()
+  let selectedSkills = [];
+  for (i = 0; i < list.length; i++){
+    selectedSkills.push(
+      {
+        text: {
+          type: "plain_text",
+          text: list[i],
+          emoji: true
+        },
+        value: list[i]
+      }
+    );
+  }
+  return selectedSkills;
+}
+
+// Adds user inputted skill into database
 const addSkill = async function(topic, skill) {
   //create new MongoDB client
   let client = new MongoClient(uri, { useUnifiedTopology: true });
@@ -69,6 +88,36 @@ const addSkill = async function(topic, skill) {
     // Disconnect client from MongoDB cluster
     client.close();
   });
+}
+
+// Returns all skills sorted by group, formatted as [{ options: [{},...] },...]
+const listGroups = async function() {
+  // Create new MongoDB client
+  let client = newClient();
+  // Connect client to MongoDB cluster
+  await client.connect();
+  // Get "topics" collection from "app-data" database
+  collection = await client.db("app-data").collection("topics");
+  // Empty array to store option_groups for select menu
+  let options = [];
+  // Get array of distinct topic groups (strings) from "topics" collection
+  let topic_groups = await collection.distinct("group");
+  // Iterate over the topic groups
+  for (group of topic_groups) {
+    options.push(
+      {
+        text: {
+          type: 'plain_text',
+          text: group
+        },
+        value: group
+      }
+    );
+  }
+  return options;
+  console.log(options);
+  // Disconnect client from MongoDB cluster
+  client.close();
 }
 
 
@@ -262,5 +311,7 @@ module.exports = {
   listUsers:listUsers,
   addTopicToUser: addTopicToUser,
   findUsersByTopics: findUsersByTopics,
-  addSkill: addSkill
+  addSkill: addSkill,
+  listGroups: listGroups,
+  formatSkillList: formatSkillList
 }

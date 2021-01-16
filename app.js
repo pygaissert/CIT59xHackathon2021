@@ -80,18 +80,16 @@ app.action('button_no', async({ ack, body, say, client }) => {
 
 // ACTION:   button_createProfile
 // RESPONSE: Show modal to collect user information
-app.action('button_createProfile', async({ ack, body, say, client }) => {
+app.action('button_createProfile', async({ ack, view, body, say, client }) => {
   await ack();
   try {
     // Call the views.open method using one of the built-in WebClients
     const result = await client.views.open({
       // Pass a valid trigger_id within 3 seconds of receiving it
       trigger_id: body.trigger_id,
-      // Pass a valid view_id
-      // View payload
+      //hash: body.view.hash,
       view: await views.newUserInformation()
     });
-    console.log(result);
   } catch (error) {
     console.error(error);
   }
@@ -100,44 +98,46 @@ app.action('button_createProfile', async({ ack, body, say, client }) => {
 // ACTION:   static_select-action
 // RESPONSE: Acknowledge academic year selection
 app.action('select_year', async({ ack, body, say, client }) => {
-  // save result of selected option
-  // const val = JSON.stringify(body['actions'][0]);
-  // confirm value on console
-  // console.log(val);
-  console.log(body.actions[0].selected_option.text.text);
+  // console.log(body.actions[0].selected_option.text.text);
   // Acknowledge static_select
   await ack();
 });
 
-// Acknowledge multi-select skills
-app.action('select_skill', async({ ack, body, say, client }) => {
+// ACTION: multi_static_select-action
+// RESPONSE: Acknowledge multi-select skills
+app.action('select_topics_newuser', async({ ack, body, say, client }) => {
   // print out info
-  console.log(body.actions.selected_options);
+  // console.log(body.actions.selected_options);
   // Acknowledge selection of skill
   await ack();
 });
 
 // ACTION:   button_addSkill
-// RESPONSE: Acknowledge skills selection and open new modal
-app.action('button_addSkill', async({ ack, body, say, client }) => {
-  //console.log(body);
+// RESPONSE: Acknowledge skills selection and open add_skill modal
+app.action('button_addSkill', async({ ack, view, body, say, client }) => {
   // Acknowledge addSkill button
   await ack();
-  // open new modal view to add new skill
+  let selectedSkills = body.view.state.values.select_skill.select_topics_newuser.selected_options;
+  var skills = [];
+  console.log(selectedSkills);
+  for (i = 0; i < selectedSkills.length; i++){
+  //  skills.push(selectedSkills[i].value);
+    console.log(selectedSkills[i].value);
+    skills.push(`${selectedSkills[i].value}`);
+  }
+  console.log(skills);
+// open new modal view to add new skill
   try {
     const result = await client.views.push({
       trigger_id: body.trigger_id,
-      view: views.addSkill()
+      // View payload with updated blocks
+      view: await views.addSkill(body.view.hash, skills)
     });
   } catch (error){
     console.error(error);
   }
 });
 
-
-app.action('select_topics_newuser', async({ ack}) => {
-  await ack();
-})
 
 // Acknowledge character input on Add Skills Modal: Topic of expertise
 app.action('add_Topic', async({ ack, body, say, client}) => {
@@ -153,9 +153,8 @@ app.action('add_Skill', async({ ack, body, say, client}) => {
 
 // Submission of introduction modal and extraction of data
 app.view('modal-newuser', async({ ack, view, body, say, client }) => {
-  // print out selected academic year value
-  //console.log(view.state.values.select_year['static_select-action'].selected_option.value);
   let year = view.state.values.select_year['static_select-action'].selected_option.value;
+  // print out selected academic year value
   console.log(year);
   // parse through selected skills
   let skillList = view.state.values.select_skill.select_skill.selected_options;
@@ -179,6 +178,28 @@ app.view('modal-newuser', async({ ack, view, body, say, client }) => {
             type: "mrkdwn",
             text: "Profile successfully added to database!"
           },
+        },
+        {
+          type: "actions",
+          elements: [
+            {
+              type: "button",
+              text: {
+                type: "plain_text",
+                text: "Edit Profile"
+              },
+              style: "primary",
+              action_id: "button_edit"
+            },
+            {
+              type: "button",
+              text: {
+                type: "plain_text",
+                text: "Ask a Question"
+              },
+              action_id: "button_question"
+            }
+          ]
         }
       ]
     });
@@ -193,17 +214,39 @@ app.view('modal-newuser', async({ ack, view, body, say, client }) => {
 });
 
 // Submission of introduction's stacked add modal view
-app.view('NewSkill', async({ ack, view, body, say, client }) => {
-  //print group value
-  topic = view.state.values.add_new_topic.add_Topic.value;
-  console.log(topic);
-  // print skill value
-  skill = view.state.values.add_new_skill.add_Skill.value;
-  console.log(skill);
+app.view('modal_addskill', async({ ack, view, response, body, say, client }) => {
   await ack();
-  // Add to MongoDB database
+  //print group value
+  let topic = view.state.values.add_Topic.add_Topic.selected_option.value;
+  console.log(`Topic: ${topic}`);
+  // print skill value
+  let skill = view.state.values.add_Skill.add_Skill.value;
+  console.log(`Skill: ${skill}`);
+  //console.log(body.view);
+  //console.log("hash: " + body.view.private_metadata.split('_')[0]);
+  //console.log(body.view.private_metadata.split('_')[1]);
+  //console.log(body.view.private_metadata.split('_')[1].length);
+  let skill_list = body.view.private_metadata.split('_')[1].split(',');
+  skill_list.push(skill);
+  let selected_skill_list = await data.formatSkillList(skill_list);
+  //console.log(selected_skill_list);
   try {
+    // Add to MongoDB database
     await data.addSkill(topic, skill);
+    clearNewUserInfo = await views.newUserInformation();
+    clearNewUserInfo.blocks[2] = await views.clearSkillList();
+    updateNewUserInfo = await views.newUserInformation();
+    updateNewUserInfo.blocks[2] = await views.updateSkillList(selected_skill_list);
+    //console.log(updateNewUserInfo.blocks);
+    await client.views.update({
+      view_id: body.view.root_view_id,
+      hash: body.view.private_metadata.split('_')[0],
+      view: clearNewUserInfo
+    });
+    await client.views.update({
+      view_id: body.view.root_view_id,
+      view: updateNewUserInfo
+    });
   } catch (error) {
     console.log(error);
   }
