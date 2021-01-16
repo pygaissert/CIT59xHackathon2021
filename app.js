@@ -301,6 +301,8 @@ app.event('app_home_opened', async({ event, client }) =>{
 
 
 //// app_command
+
+// implement these when above functions are finished
 // create_profile
 app.command('/create-profile', async ({ command, ack, say, body, client}) => {
   await ack();
@@ -325,12 +327,11 @@ app.command('/ask-question', async ({ command, ack, say, body, client}) => {
 app.command('/view-people', async ({ command, ack, say, body, client}) => {
   // acknowlege the command request
   await ack();
-  console.log("User wants to view other people's profiles ");
   try {
     // open modal view from views, list all people currently in the db
     const result = await client.views.open({
       trigger_id: body.trigger_id,
-      view: views.list_profiles()
+      view: await views.showAllProfiles()
     });
 
     console.log(result);
@@ -342,19 +343,19 @@ app.command('/view-people', async ({ command, ack, say, body, client}) => {
 app.command('/my-profile', async ({ command, ack, say, body, client}) => {
   // acknowlege the command request
   await ack();
-  console.log(`User: ${command.user_id} wants to view their profile `);
 
-  // try {
-  //   // open modal view from views, show user's own profile
-  //   const result = await client.views.open({
-  //     trigger_id: body.trigger_id,
-  //     view: views.list_profiles()
-  //   });
-  //
-  //   console.log(result);
-  // } catch (error){
-  //   console.error(error);
-  // }
+  try {
+    // write new message, show user's own profile
+    const result = await say(
+      // change this
+      // await views.showUserProfile(command.user_id)
+      await views.showUserProfile("U01JMNX5NSF")
+    );
+
+    console.log(result);
+  } catch (error){
+    console.error(error);
+  }
 });
 
 

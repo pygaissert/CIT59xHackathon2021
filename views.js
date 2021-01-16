@@ -414,9 +414,6 @@ const selectUsers = function(userList) {
 }
 
 
-
-
-
 // basic fucntions
 
 const homepage = function (event){
@@ -465,7 +462,7 @@ const homepage = function (event){
   			"accessory": {
   				"type": "image",
   				"image_url": "https://memegenerator.net/img/images/4637859/spongebob-rainbow.jpg",
-  				"alt_text": "alt text for image"
+  				"alt_text": "spongebob_rainbow"
   			}
   		},
   		{
@@ -534,9 +531,155 @@ const homepage = function (event){
 };
 
 
-// return a modal view of existing users profiles
-const listProfiles = function() {
+// by user_id, return a message blocks element of an existing user profile
+const showUserProfile = async function(user_id) {
+  let output = await data.getProfileById(user_id);
 
+  // console.log(output);
+  return {
+    "blocks": [
+      {
+  			"type": "header",
+  			"text": {
+  				"type": "plain_text",
+  				"text": "Your Current Elicit Profile:",
+  				"emoji": true
+  			}
+  		},
+      {
+        "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          // TO-DO <@${user_id}>
+          "text": `:bust_in_silhouette:  *Name*: ${user_id}\n\n :mortar_board:  *Graduating Year*: ${output[0]}\n\n :brain:  *Expertise*: ${output[1]}`
+        },
+  			// "accessory": {
+  			// 	"type": "image",
+  			// 	"image_url": url,
+  			// 	"alt_text": "alt text for image"
+  			// }
+      },
+      {
+        "type": "section",
+        "text": {
+          "type": "plain_text",
+          "text": " ",
+          "emoji": true
+        }
+      },
+      {
+        "type": "actions",
+        "elements": [
+          {
+            "type": "button",
+            "text": {
+              "type": "plain_text",
+              "text": "Edit Your Profile"
+            },
+            "style": "primary",
+            "action_id": "button_edit"
+          }
+        ]
+      }
+    ]
+  }
+}
+
+
+// by user_id, return a message blocks element of an existing user profile
+const showAllProfiles = async function() {
+  let output = await data.getAllProfile();
+
+  // get blocks
+  let blocks = [];
+  // add header
+  blocks.push(
+  {
+    "type": "header",
+    "text": {
+      "type": "plain_text",
+      "text": "Welcome to the Elicit community!",
+      "emoji": true
+    }
+  },
+  {
+    "type": "section",
+    "text": {
+      "type": "mrkdwn",
+      "text": "Here you can view all user in the MCIT community we have data of. Look through it and see if you find anyone you want to talk to.\n\n:bust_in_silhouette:  Name   :mortar_board:  Graduating Year   :brain:  Expertise"
+    },
+      "accessory": {
+        "type": "image",
+        "image_url": "https://i.pinimg.com/originals/d7/0c/f5/d70cf54d4f45da79f3397ed9588f9ae8.jpg",
+        "alt_text": "spongebob_community"
+      }
+  },
+  {
+    "type": "divider"
+  });
+
+  output.forEach(function(user){
+      blocks.push(
+    {
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+        // TODO
+        // <@${user[0]}>
+        // "text": `:bust_in_silhouette:  Name: *${user[0]}*\n\n :mortar_board:  Graduating Year: *${user[1]}*\n\n :brain:  Expertise: *${user[2]}*`
+        "text": `:bust_in_silhouette:  *${user[0]}*\n\n :mortar_board:  *${user[1]}*`
+			},
+			"accessory": {
+				"type": "button",
+				"text": {
+					"type": "plain_text",
+					"text": "Message  :outbox_tray:",
+					"emoji": true
+				},
+				"value": user[0],
+				"action_id": "button_message_by_profile"
+			},
+
+		},
+    {
+      "type": "section",
+			"text": {
+				"type": "mrkdwn",
+        // TODO
+        // <@${user[0]}>
+        // "text": `:bust_in_silhouette:  Name: *${user[0]}*\n\n :mortar_board:  Graduating Year: *${user[1]}*\n\n :brain:  Expertise: *${user[2]}*`
+        "text": `:brain:  ${user[2]}`
+			},
+    },
+    {
+      "type": "divider"
+    }
+
+      );
+  });
+
+
+
+
+  return {
+    	"title": {
+    		"type": "plain_text",
+    		"text": "Elicit Profiles",
+    		"emoji": true
+    	},
+    	// "submit": {
+    	// 	"type": "plain_text",
+    	// 	"text": "Submit",
+    	// 	"emoji": true
+    	// },
+    	"type": "modal",
+    	"close": {
+    		"type": "plain_text",
+    		"text": "Cancel",
+    		"emoji": true
+    	},
+    	"blocks": blocks
+  }
 }
 
 
@@ -550,5 +693,6 @@ module.exports = {
   newUserInformation: newUserInformation,
   addSkill: addSkill,
   homepage: homepage,
-  listProfiles: listProfiles
+  showUserProfile: showUserProfile,
+  showAllProfiles:showAllProfiles
 }

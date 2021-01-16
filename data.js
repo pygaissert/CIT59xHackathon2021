@@ -255,6 +255,96 @@ const findUsersByTopics = async function(topics) {
   return topic_groups;
 }
 
+
+// function to to get user profile in array, by user id
+// TODO: change filter when database is implemented
+const getProfileById = async function(user_id){
+
+  // return values: two strings, year and expertise
+  let res = [];
+
+  // Create new MongoDB client
+  let client = newClient();
+  // Connect client to MongoDB cluster
+  await client.connect();
+
+  // get skills:
+  // get two collections
+  let collectionUserTopic = await client.db("app-data").collection("topics-users");
+  let collectionUsers = await client.db("app-data").collection("users");
+
+  // get user document
+  let user = await collectionUsers.findOne({slack_id:user_id});
+
+  // get user graduating year:
+  res.push(user.year);
+
+
+  // array to store expertise of given user_id
+  let exList = [];
+  // Get topics associated with given user_id, add to array
+  await collectionUserTopic.find({user:user_id}).sort({"topic":1}).forEach( function(item) {
+    // exList.push(item.topic);
+    exList.push(item.topic);
+  });
+  // concat all string in array and sperate by comma+spaces
+  res.push(exList.join(", "));
+
+  return res;
+}
+
+// function to to get all user profile in 2D array
+// TODO: change filter when database is implemented
+const getAllProfile = async function(){
+
+  // return values, 2D arrays,
+  // [["user_id", "year", "skills"]]
+  let res = [];
+
+  // Create new MongoDB client
+  let client = newClient();
+  // Connect client to MongoDB cluster
+  await client.connect();
+
+  // get two collections
+  let collectionUserTopic = await client.db("app-data").collection("topics-users");
+  let collectionUsers = await client.db("app-data").collection("users");
+
+  // Get array of distinct user_id
+  // TODO: think about if there is repeat or not exist
+  let users = await collectionUserTopic.distinct("user");
+  users.sort();
+  // Iterate over users
+  for (u of users) {
+    let temp = [];
+
+    // get user document
+    let user = await collectionUsers.findOne({slack_id:u});
+
+    // !!!!! TODO: change this
+    // // push user_id
+    // temp.push(u);
+
+    temp.push(user.name);
+    // push year
+    temp.push(user.year);
+
+    // get skill list, sorted
+    let exList = [];
+    await collectionUserTopic.find({user:u}).sort({"group":1, "topic":1}).forEach( function(item) {
+      exList.push(item.topic);
+    });
+    // push skills
+    temp.push(exList.join(", "));
+
+    // push to 2D return array
+    res.push(temp);
+  }
+
+  return res;
+}
+
+
 module.exports = {
   addUser: addUser,
   userExists: userExists,
@@ -262,5 +352,7 @@ module.exports = {
   listUsers:listUsers,
   addTopicToUser: addTopicToUser,
   findUsersByTopics: findUsersByTopics,
-  addSkill: addSkill
+  addSkill: addSkill,
+  getProfileById: getProfileById,
+  getAllProfile: getAllProfile
 }
