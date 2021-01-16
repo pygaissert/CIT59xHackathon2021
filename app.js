@@ -23,7 +23,8 @@ const app = new App({
 });
 
 
-// Listens to incoming messages that contain "hello"
+// ACTION: message (Hello, hello, Hi, hi)
+// RESPONSE:
 app.message(/^([Hh]ello)|([Hh]i).*/, async({message, say}) => {
   // Check if user is in database
   if (await data.userExists(message.user)) {
@@ -33,10 +34,18 @@ app.message(/^([Hh]ello)|([Hh]i).*/, async({message, say}) => {
   }
 });
 
+/* NEW USER MESSAGE */
+
+// ACTION: button_yes
+// RESPONSE: Prompt the user to create an EliCIT profile
 app.action('button_yes', async({ ack, body, say, client }) => {
+  // Acknowledge the button click
   await ack();
+  // Updates the previous message
   await client.chat.update({
+    // Channel ID of the message containing the button
     channel: body.channel.id,
+    // Timestamp of the message containing the button
     ts: body.container.message_ts,
     blocks: [
       {
@@ -64,27 +73,37 @@ app.action('button_yes', async({ ack, body, say, client }) => {
   });
 });
 
-
+// Respond to the user when they click "No"
 app.action('button_no', async({ ack, body, say, client }) => {
+  // Acknowledge the button click
   await ack();
-  await client.chat.update({
-    channel: body.channel.id,
-    ts: body.container.message_ts,
-    blocks: [],
-    text: "No problem! Let me know if you change your mind!",
-    message: {
+  try {
+    // Updates the previous message
+    await client.chat.update({
+      // Channel ID of the message containing the button
+      channel: body.channel.id,
+      // Timestamp of the message containing the button
+      ts: body.container.message_ts,
+      blocks: [],
       text: "No problem! Let me know if you change your mind!",
-      user: body.user.id
-    }
-  });
+      message: {
+        text: "No problem! Let me know if you change your mind!",
+        user: body.user.id
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
 });
 
+/* NEW USER CREATES PROFILE */
+
 // ACTION:   button_createProfile
-// RESPONSE: Show modal to collect user information
+// RESPONSE: Open modal for user to create an EliCIT profile
 app.action('button_createProfile', async({ ack, body, say, client }) => {
   await ack();
   try {
-    // Call the views.open method using one of the built-in WebClients
+    // Open the modal for creating an EliCIT profile
     const result = await client.views.open({
       // Pass a valid trigger_id within 3 seconds of receiving it
       trigger_id: body.trigger_id,
@@ -119,13 +138,12 @@ app.action('select_skill', async({ ack, body, say, client }) => {
 });
 
 // ACTION:   button_addSkill
-// RESPONSE: Acknowledge skills selection and open new modal
+// RESPONSE: Open modal for adding new skills to the database
 app.action('button_addSkill', async({ ack, body, say, client }) => {
-  //console.log(body);
-  // Acknowledge addSkill button
+  // Acknowledge button click
   await ack();
-  // open new modal view to add new skill
   try {
+    // Open modal for adding new skills
     const result = await client.views.push({
       trigger_id: body.trigger_id,
       view: views.addSkill()
@@ -196,12 +214,12 @@ app.view('NewSkill', async({ ack, view, body, say, client }) => {
 });
 
 
-/* QUESTION FORM */
+/* USER ASKS A QUESTION */
 
-// ACTION:   button_question
+// ACTION:   User clicks the button to ask a question
 // RESPONSE: Open a modal view to allow user to ask a question
 app.action('button_question',async({ack, body, client}) =>{
-  // Acknowlege the action request
+  // Acknowlege the button click
   await ack();
   console.log("Acknowledged - Opening Question Form")
   try {
@@ -215,11 +233,55 @@ app.action('button_question',async({ack, body, client}) =>{
   }
 });
 
-// when user submit question, read view_submission
+// ACTION: User selects topics in the Question Form
+// RESPONSE: Update the multi-select menu of users
+app.action('select_topics_question', async({ ack, body, action, client }) => {
+  // Acknowledge the selection
+  await ack();
+  console.log("Acknowledged - Topic Selected");
+  // Create a new identical question form view
+  updatedQuestionForm = await views.questionForm();
+  // Check if there are topics selected
+  if (action.selected_options.length == 0) {
+    updatedQuestionForm.blocks[2] = views.noTopicsSelected;
+  } else {
+    let updated_topics = parse.getValuesFromOptions(action.selected_options);
+    // Get list of Slack IDs associated with the selected topics
+    userList = await data.findUsersByTopics(updated_topics);
+    // Check for empty topic groups
+    if (userList.length == 0) {
+      updatedQuestionForm.blocks[2] = await views.noUsersFound(updated_topics);
+    } else {
+      updatedQuestionForm.blocks[2] = await views.usersSelected(userList);
+    }
+  }
+  // Update the Question Form modal (INCOMPLETE)
+  try {
+    await client.views.update({
+      view: updatedQuestionForm,
+      view_id: body.view.id,
+      hash: body.view.hash,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+
+app.action('select_users_question', async({ack}) => {
+  await ack();
+  console.log("Acknowledged - User Selected")
+})
+
+// TODO - if no users were selected, send to ALL users related to the topic(s)
+
+// ACTION: User submits the Question Form
+// RESPONSE: Creates a group direct message and sends question
 app.view('submit_question', async({ ack, body, view, client }) => {
-  // acknowlege the command request
+  // Acknowledge the view_submission
   await ack();
   console.log("Acknowledged - Question Submitted");
+  // Parse the view_submission for the question, the topics, and the users
   submission = parse.parseQuestionSubmission(view, body.user.id);
   console.log(submission.users);
   try {
@@ -251,41 +313,6 @@ app.view('submit_question', async({ ack, body, view, client }) => {
     console.error(error);
   }
 });
-
-app.action('select_topics_question', async({ ack, body, action, client }) => {
-  await ack();
-  console.log("Acknowledged - Topic Selected");
-  // Create a new identical question form view
-  updatedQuestionForm = await views.questionForm();
-  // Check if there are topics selected
-  if (action.selected_options.length == 0) {
-    updatedQuestionForm.blocks[2] = views.noTopicsSelected;
-  } else {
-    let updated_topics = parse.getValuesFromOptions(action.selected_options);
-    // Get list of Slack IDs associated with the selected topics
-    userList = await data.findUsersByTopics(updated_topics);
-    // Check for empty topic groups
-    if (userList.length == 0) {
-      updatedQuestionForm.blocks[2] = await views.noUsersFound(updated_topics);
-    } else {
-      updatedQuestionForm.blocks[2] = await views.usersSelected(userList);
-    }
-  }
-  try {
-    await client.views.update({
-      view: updatedQuestionForm,
-      view_id: body.view.id,
-      hash: body.view.hash,
-    });
-  } catch (error) {
-    console.log(error);
-  }
-});
-
-app.action('select_users_question', async({ack}) => {
-  await ack();
-  console.log("Acknowledged - User Selected")
-})
 
 // adding some basic function below:
 
