@@ -408,7 +408,7 @@ const noUsersFound = function(empty_groups){
   }
 }
 
-const usersSelected = function(userList) {
+const usersFound = function(userList) {
   return {
     type: "section",
     block_id: "select_users_question",
@@ -725,7 +725,7 @@ const showUserProfile = async function(user_id) {
             // "thumb_url": "https://static.wikia.nocookie.net/spongebob/images/9/96/The_Two_Faces_of_Squidward_174.png/revision/latest/scale-to-width-down/1000?cb=20200923005328",
             // "footer": "footer",
             // "ts": 123456789
-            ,
+            // ,
             "blocks": [
               {
                 "type": "actions",
@@ -868,16 +868,14 @@ module.exports = {
   newUserGreeting: newUserGreeting,
   newUserInformation: newUserInformation,
   addSkill: addSkill,
-
   homepage: homepage,
   showUserProfile: showUserProfile,
   showAllProfiles:showAllProfiles,
-  listProfiles: listProfiles,
   clearSkillList: clearSkillList,
   updateSkillList: updateSkillList,
   existingUserGreeting: existingUserGreeting,
   questionForm: questionForm,
-  usersSelected: usersSelected,
+  usersFound: usersFound,
   noUsersFound: noUsersFound,
   noTopicsSelected: noTopicsSelected
 

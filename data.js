@@ -69,10 +69,10 @@ const addUserSkill = async function(userId, skillList) {
       }
       let saved = doc.ops[0];
       console.log(`${saved.user}: ${saved.topic})`);
-  }
+    });
     // Disconnect client from MongoDB cluster
     client.close();
-  });
+  };
 }
 
 // format selected skills into options block for update NewUserView

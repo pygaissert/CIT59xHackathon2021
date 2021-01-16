@@ -190,57 +190,53 @@ app.view('modal-newuser', async({ ack, view, body, say, client }) => {
     // add user name, id, and graduation year to users collection
     await data.addUser(body.user.name, body.user.id, year);
     // add user and skills to topics-user collection
-
-
-
-
-
-    await client.chat.update({
-      // COMBINE THIS.........
-      channel: body.channel.id,
-      ts: body.container.message_ts,
-      blocks: [
-        {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: "Profile successfully added to database!"
-          },
-        },
-        {
-          type: "actions",
-          elements: [
-            {
-              type: "button",
-              text: {
-                type: "plain_text",
-                text: "Edit Profile"
-              },
-              style: "primary",
-              action_id: "button_edit"
-            },
-            {
-              type: "button",
-              text: {
-                type: "plain_text",
-                text: "Ask a Question"
-              },
-              action_id: "button_question"
-            }
-          ]
-        }
-      ]
-      // .......WITH THIS
-      channel: view.private_metadata.split('_')[0],
-      ts: view.private_metadata.split('_')[1],
-      blocks: [],
-      text: `All done! Thank you for joining, <@${body.user.id}>!`,
-      message: {
-        text: `All done! Thank you for joining, <@${body.user.id}>!`,
-        user: body.user.id
-      }
-
-    });
+    //
+    // await client.chat.update({
+    //   // COMBINE THIS.........
+    //   channel: body.channel.id,
+    //   ts: body.container.message_ts,
+    //   blocks: [
+    //     {
+    //       type: "section",
+    //       text: {
+    //         type: "mrkdwn",
+    //         text: "Profile successfully added to database!"
+    //       },
+    //     },
+    //     {
+    //       type: "actions",
+    //       elements: [
+    //         {
+    //           type: "button",
+    //           text: {
+    //             type: "plain_text",
+    //             text: "Edit Profile"
+    //           },
+    //           style: "primary",
+    //           action_id: "button_edit"
+    //         },
+    //         {
+    //           type: "button",
+    //           text: {
+    //             type: "plain_text",
+    //             text: "Ask a Question"
+    //           },
+    //           action_id: "button_question"
+    //         }
+    //       ]
+    //     }
+    //   ]
+    //   // .......WITH THIS
+    //   channel: view.private_metadata.split('_')[0],
+    //   ts: view.private_metadata.split('_')[1],
+    //   blocks: [],
+    //   text: `All done! Thank you for joining, <@${body.user.id}>!`,
+    //   message: {
+    //     text: `All done! Thank you for joining, <@${body.user.id}>!`,
+    //     user: body.user.id
+    //   }
+    //
+    // });
   } catch (error) {
     console.log(error);
   }
@@ -314,23 +310,51 @@ app.action('select_topics_question', async({ ack, body, action, client }) => {
   updatedQuestionForm = await views.questionForm();
   // Check if there are topics selected
   if (action.selected_options.length == 0) {
+    // Give the updated view an empty 3rd block
     updatedQuestionForm.blocks[2] = views.noTopicsSelected;
   } else {
-    // Parse values from selected options
-    let updatedTopicsList = parse.getValuesFromOptions(action.selected_options);
+    // Parse selected topics from selected options
+    updatedTopicsList = parse.getValuesFromOptions(action.selected_options);
     // Get list of Slack IDs associated with the selected topics
     relatedUserList = await data.findUsersByTopics(updatedTopicsList);
     // Check if related users were found
     if (relatedUserList.length == 0) {
       updatedQuestionForm.blocks[2] = await views.noUsersFound(updatedTopicsList);
     } else {
-      updatedQuestionForm.blocks[2] = await views.usersSelected(relatedUserList);
+      updatedQuestionForm.blocks[2] = await views.usersFound(relatedUserList);
+      // Check if there were users already selected
+      if (body.view.state.values.select_users_question) {
+          // Get the list of selected users as JSON object
+          selectedUsers = body.view.state.values.select_users_question.select_users_question.selected_options;
+          initialUsers = [];
+          selectedUsers.forEach( (user) => {
+            updatedQuestionForm.blocks[2].accessory.option_groups.forEach( (group) => {
+              if (initialUsers.includes(user)) {
+                return;
+              }
+              if (parse.getValuesFromOptions(group.options).includes(user.value)) {
+                initialUsers.push(user);
+              }
+            });
+          });
+          console.log(initialUsers);
+          if (initialUsers.length != 0) {
+            updatedQuestionForm.blocks[2].accessory.initial_options = initialUsers;
+          }
+        }
+      }
     }
-  }
+
   // Update the Question Form modal (INCOMPLETE)
   tempForm = await views.questionForm();
   tempForm.blocks[2] = views.noTopicsSelected;
   try {
+    await client.views.update({
+      token: slackBotToken,
+      view: tempForm,
+      view_id: body.view.id,
+      hash: body.view.hash,
+    });
     await client.views.update({
       token: slackBotToken,
       view: updatedQuestionForm,
