@@ -524,7 +524,7 @@ app.action('button_message_by_profile',async({action, ack, body, client}) =>{
         private_metadata: dm_id,
       	title: {
       		type: "plain_text",
-      		text: "Confirm your message reuqest!",
+      		text: "Confirm your request!",
       		emoji: true
       	},
       	submit: {
@@ -561,6 +561,7 @@ app.action('button_message_by_profile',async({action, ack, body, client}) =>{
   }
 });
 
+
 app.view('dm_rusure', async({ ack, body, view, client }) => {
   // Acknowledge the view_submission
   await ack();
@@ -582,7 +583,7 @@ app.view('dm_rusure', async({ ack, body, view, client }) => {
         private_metadata: dm_to_id,
         title: {
           type: "plain_text",
-          text: "Message sent!",
+          text: "Message Sent!",
           emoji: true
         },
         close: {
@@ -595,7 +596,7 @@ app.view('dm_rusure', async({ ack, body, view, client }) => {
             type: "section",
             text: {
               type: "mrkdwn",
-              text: `*Message sent to ${dm_to_id}!*`
+              text: `*Message sent to ${dm_to_id}*`
             }
           }
         ]
