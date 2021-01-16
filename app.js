@@ -229,7 +229,7 @@ app.view('modal-newuser', async({ ack, view, body, say, client }) => {
             }
           ]
         }
-      ]
+      ],
       // .......WITH THIS
       channel: view.private_metadata.split('_')[0],
       ts: view.private_metadata.split('_')[1],
@@ -409,9 +409,6 @@ app.event('app_home_opened', async({ event, client }) =>{
 });
 
 /* SLASH COMMANDS */
-
-//// app_command
-
 // implement these when above functions are finished
 // edit_profile
 app.command('/edit-profile', async ({ command, ack, say, body, client}) => {
@@ -426,11 +423,11 @@ app.command('/ask-question', async ({ command, ack, say, body, client}) => {
   console.log("User wants to ask question ");
   // add function
 });
-
 // view_people
 app.command('/view-people', async ({ command, ack, say, body, client}) => {
   // acknowlege the command request
   await ack();
+
   try {
     // open modal view from views, list all people currently in the db
     const result = await client.views.open({
@@ -462,21 +459,192 @@ app.command('/my-profile', async ({ command, ack, say, body, client}) => {
   //   ]
   // });
 
+  // TODO change this to user_id
+  // await views.showUserProfile(command.user_id)
+
     // write new message, show user's own profile
     const result = await say(
-      // TODO change this
-      // await views.showUserProfile(command.user_id)
       await views.showUserProfile("U01JMNX5NSF")
-
-
-
     );
 
-    console.log(result);
+    // console.log(result);
+    // console.log("!!!!!!!!");
+    // await client.chat.update({
+    //   // Channel ID of the message
+    //   channel: result.channel,
+    //   // Timestamp of the message containing the button
+    //   ts: result.ts,
+    //   blocks: [
+    //     {
+    //       type: "section",
+    //       text: {
+    //         type: "mrkdwn",
+    //         text: "Then let's get you started!"
+    //       },
+    //     },
+    //     {
+    //       type: "actions",
+    //       elements: [
+    //         {
+    //           type: "button",
+    //           text: {
+    //             type: "plain_text",
+    //             text: "Click to create your profile!"
+    //           },
+    //           style: "primary",
+    //           action_id: "button_createProfile"
+    //         }
+    //       ]
+    //     }
+    //   ]
+    // });
   } catch (error){
     console.error(error);
   }
 });
+
+// profiles actions
+// message user by profile:
+app.action('button_message_by_profile',async({action, ack, body, client}) =>{
+  // Acknowledge the view_submission
+  await ack();
+  console.log("Acknowledged - DM");
+
+  let dm_id = await action.value;
+  console.log(action)
+  let userInfo = await data.getProfileById(dm_id);
+
+  try {
+    // open modal view to ask user
+    const result = await client.views.push({
+      trigger_id: body.trigger_id,
+      view: {
+      	type: "modal",
+      	callback_id: "dm_rusure",
+        private_metadata: dm_id,
+      	title: {
+      		type: "plain_text",
+      		text: "Confirm your message reuqest!",
+      		emoji: true
+      	},
+      	submit: {
+      		type: "plain_text",
+      		text: "Send!",
+      		emoji: true
+      	},
+      	close: {
+      		type: "plain_text",
+      		text: "Cancel",
+      		emoji: true
+      	},
+      	blocks: [
+      		{
+      			type: "section",
+      			text: {
+      				type: "mrkdwn",
+      				text: `*Are you sure you want to send a message to ${dm_id}?*`
+      			}
+      		},
+      		{
+      			type: "section",
+      			text: {
+      				type: "mrkdwn",
+      				text: `:bust_in_silhouette:  *${dm_id}*\n\n :mortar_board:  *${userInfo[0]}*\n\n :brain:  ${userInfo[1]}`
+      			}
+      		}
+      	]
+      }
+    });
+
+  } catch (error){
+    console.error(error);
+  }
+});
+
+app.view('dm_rusure', async({ ack, body, view, client }) => {
+  // Acknowledge the view_submission
+  await ack();
+  console.log("Acknowledged - sure!");
+
+  let dm_to_id = view.private_metadata;
+
+  console.log(view.root_view_id)
+  // Parse the view_submission for the question, the topics, and the users
+  try {
+
+    // confirm message
+    // open modal view to ask user
+    await client.views.update({
+      view_id: view.root_view_id,
+      view: {
+        type: "modal",
+        callback_id: "dm_sent",
+        private_metadata: dm_to_id,
+        title: {
+          type: "plain_text",
+          text: "Message sent!",
+          emoji: true
+        },
+        close: {
+          type: "plain_text",
+          text: "Close",
+          emoji: true
+        },
+        blocks: [
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: `*Message sent to ${dm_to_id}!*`
+            }
+          }
+        ]
+      }
+    });
+
+    // send message
+    let result = await client.conversations.open({
+      token: slackBotToken,
+      users: body.user.id //TO cahnge this to group
+    });
+
+    // TODO change this
+    let userProfile = await data.getProfileById("U01JMNSEL75");
+
+    let msg = await client.chat.postMessage({
+      token: slackBotToken,
+      channel: result.channel.id,
+      text: `Hi, <@${dm_to_id}>!!!\n\n Your fellow classmate <@${body.user.id}> wants to connect with you!\nHere is their profile:`,
+      attachments: [
+          {
+              color: "#36a64f",
+              fields: [
+                  {
+                      title: ":bust_in_silhouette:  *Name*:",
+                      value: `-\t  <@${body.user.id}>`,
+                      short: true
+                  },
+                  {
+                      title: ":mortar_board:  *Graduating Year*: ",
+                      value: `-\t  ${userProfile[0]}`,
+                      short: true
+                  },
+                  {
+                      title: ":brain:  *Expertise*:",
+                      value: `-\t  ${userProfile[1]}`,
+                      short: false
+              }
+
+          ]
+      }
+    ]
+    });
+  } catch (error){
+    console.error(error);
+  }
+});
+
+
 
 // STARTS THE APP
 (async () => {

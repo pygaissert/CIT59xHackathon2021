@@ -69,10 +69,10 @@ const addUserSkill = async function(userId, skillList) {
       }
       let saved = doc.ops[0];
       console.log(`${saved.user}: ${saved.topic})`);
+  });
   }
     // Disconnect client from MongoDB cluster
     client.close();
-  });
 }
 
 // format selected skills into options block for update NewUserView
@@ -286,6 +286,7 @@ const getProfileById = async function(user_id){
   // get user document
   let user = await collectionUsers.findOne({slack_id:user_id});
 
+  console.log(user_id)
   // get user graduating year:
   res.push(user.year);
 
@@ -335,7 +336,7 @@ const getAllProfile = async function(){
     // // push user_id
     // temp.push(u);
 
-    temp.push(user.name);
+    temp.push(u);
     // push year
     temp.push(user.year);
 

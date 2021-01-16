@@ -500,7 +500,7 @@ const homepage = function (event){
   			},
   			"accessory": {
   				"type": "image",
-  				"image_url": "https://memegenerator.net/img/images/4637859/spongebob-rainbow.jpg",
+  				"image_url": "https://raw.githubusercontent.com/pygaissert/CIT59xHackathon2021/main/pics/spongebob-rainbow.jpg",
   				"alt_text": "spongebob_rainbow"
   			}
   		},
@@ -694,9 +694,9 @@ const showUserProfile = async function(user_id) {
 
     "attachments": [
         {
-	        "mrkdwn_in": ["text"],
+	        // "mrkdwn_in": ["text"],
             "color": "#36a64f",
-            "pretext": "*Here is your current Elicit profile:*",
+            // "pretext": "*Here is your current Elicit profile:*",
             // "text": `:bust_in_silhouette:  *Name*:  ${user_id}`,
             "fields": [
                 {
@@ -714,7 +714,7 @@ const showUserProfile = async function(user_id) {
                     "value": `-\t  ${output[1]}`,
                     "short": false
 
-                },
+                }
                 // {
                 //     "title": ":brain:  *Expertise*:",
                 //     "value": `-\t  ${output[1]}`,
@@ -725,39 +725,42 @@ const showUserProfile = async function(user_id) {
             // "thumb_url": "https://static.wikia.nocookie.net/spongebob/images/9/96/The_Two_Faces_of_Squidward_174.png/revision/latest/scale-to-width-down/1000?cb=20200923005328",
             // "footer": "footer",
             // "ts": 123456789
-            ,
-            "blocks": [
-              {
-                "type": "actions",
-                "elements": [
-                  {
-                    "type": "button",
-                    "text": {
-                      "type": "plain_text",
-                      "text": "Edit Your Profile"
-                    },
-                    "style": "primary",
-                    "action_id": "button_edit"
-                  }
-                ]
-              }
-            ]
+
         },
+        {
+          "color": "#f2c744",
+          "blocks": [
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "*Learned new skills? Click to update yoru profile:*",
+                    }
+                  },
+            {
+              "type": "actions",
+              "elements": [
+                {
+                  "type": "button",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "Edit Your Profile"
+                  },
+                  "style": "primary",
+                  "action_id": "button_edit"
+                }
+              ]
+            }
+          ]
+        }
       ],
       "blocks": [
         {
-          "type": "actions",
-          "elements": [
-            {
-              "type": "button",
-              "text": {
-                "type": "plain_text",
-                "text": "Edit Your Profile"
-              },
-              "style": "primary",
-              "action_id": "button_edit"
-            }
-          ]
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*Here is your current Elicit profile:*"
+          }
         }
       ]
   }
@@ -788,7 +791,7 @@ const showAllProfiles = async function() {
     },
       "accessory": {
         "type": "image",
-        "image_url": "https://i.pinimg.com/originals/d7/0c/f5/d70cf54d4f45da79f3397ed9588f9ae8.jpg",
+        "image_url": "https://raw.githubusercontent.com/pygaissert/CIT59xHackathon2021/main/pics/spongebob_community.jpeg",
         "alt_text": "spongebob_community"
       }
   },
@@ -811,7 +814,7 @@ const showAllProfiles = async function() {
 				"type": "button",
 				"text": {
 					"type": "plain_text",
-					"text": "Message  :outbox_tray:",
+					"text": "Send message  :outbox_tray:",
 					"emoji": true
 				},
 				"value": user[0],
@@ -853,7 +856,7 @@ const showAllProfiles = async function() {
     	"type": "modal",
     	"close": {
     		"type": "plain_text",
-    		"text": "Cancel",
+    		"text": "Close",
     		"emoji": true
     	},
     	"blocks": blocks
@@ -862,17 +865,14 @@ const showAllProfiles = async function() {
 
 
 
-
 module.exports = {
   homepage: homepage,
   newUserGreeting: newUserGreeting,
   newUserInformation: newUserInformation,
   addSkill: addSkill,
-
   homepage: homepage,
   showUserProfile: showUserProfile,
   showAllProfiles:showAllProfiles,
-  listProfiles: listProfiles,
   clearSkillList: clearSkillList,
   updateSkillList: updateSkillList,
   existingUserGreeting: existingUserGreeting,
