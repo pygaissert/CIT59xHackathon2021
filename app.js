@@ -179,22 +179,11 @@ app.action('add_Skill', async({ ack, body, say, client}) => {
 
 // Submission of introduction modal and extraction of data
 app.view('modal-newuser', async({ ack, view, body, say, client }) => {
-  let year = view.state.values.select_year.graduation_year.value;
-  // print out selected academic year value
-  console.log(year);
-  // parse through selected skills
-  let skillList = view.state.values.select_skill.select_topics_newuser.selected_options;
-  var skills = [];
-  for (i = 0; i < skillList.length; i++){
-    skills.push(skillList[i].value);
-  }
-  // print out selected skills on console
-  console.log(skills);
   // Acknowledge submission of modal
   await ack();
   console.log(body);
   let values = view.state.values;
-  let year = values.select_year.select_year.selected_option.value;
+  let year = values.select_year.graduation_year.value;
   // parse through selected skills
   let skills = parse.getValuesFromOptions(values.select_topics_newuser.select_topics_newuser.selected_options);
   try {
