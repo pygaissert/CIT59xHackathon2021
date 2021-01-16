@@ -354,9 +354,12 @@ app.command('/my-profile', async ({ command, ack, say, body, client}) => {
 
     // write new message, show user's own profile
     const result = await say(
-      // change this
+      // TODO change this
       // await views.showUserProfile(command.user_id)
       await views.showUserProfile("U01JMNX5NSF")
+
+
+
     );
 
     console.log(result);

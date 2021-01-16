@@ -618,64 +618,133 @@ const showUserProfile = async function(user_id) {
 
 
   return{
+    // "attachments": [
+    //   {
+    //     "color": "#f2c744",
+    //     "blocks": [
+    //       {
+    //       	"type": "header",
+    //       	"text": {
+    //       		"type": "plain_text",
+    //       		"text": "Your Current Elicit Profile:",
+    //       		"emoji": true
+    //       	}
+    //       },
+    //       {
+    //         "type": "section",
+    //         "text": {
+    //           "type": "plain_text",
+    //           "text": " ",
+    //           "emoji": true
+    //         }
+    //       },
+    //       {
+    //         "type": "section",
+    //         "text": {
+    //           "type": "mrkdwn",
+    //           // TO-DO <@${user_id}>
+    //           "text": `:bust_in_silhouette:  *Name*: ${user_id}\n\n :mortar_board:  *Graduating Year*: ${output[0]}\n\n :brain:  *Expertise*: ${output[1]}`
+    //         },
+    //         "accessory": {
+    //         	"type": "image",
+    //         	"image_url": "https://static.wikia.nocookie.net/spongebob/images/9/96/The_Two_Faces_of_Squidward_174.png/revision/latest/scale-to-width-down/1000?cb=20200923005328",
+    //         	"alt_text": "alt text for image"
+    //         }
+    //       },
+    //       {
+    //         "type": "section",
+    //         "text": {
+    //           "type": "plain_text",
+    //           "text": " ",
+    //           "emoji": true
+    //         }
+    //       },
+    //       {
+    //         "type": "actions",
+    //         "elements": [
+    //           {
+    //             "type": "button",
+    //             "text": {
+    //               "type": "plain_text",
+    //               "text": "Edit Your Profile"
+    //             },
+    //             "style": "primary",
+    //             "action_id": "button_edit"
+    //           }
+    //         ]
+    //       }
+    //     ]
+    //   }
+    // ]
+
     "attachments": [
-      {
-        "color": "#f2c744",
-        "blocks": [
-          {
-          	"type": "header",
-          	"text": {
-          		"type": "plain_text",
-          		"text": "Your Current Elicit Profile:",
-          		"emoji": true
-          	}
-          },
-          {
-            "type": "section",
-            "text": {
-              "type": "plain_text",
-              "text": " ",
-              "emoji": true
-            }
-          },
-          {
-            "type": "section",
-            "text": {
-              "type": "mrkdwn",
-              // TO-DO <@${user_id}>
-              "text": `:bust_in_silhouette:  *Name*: ${user_id}\n\n :mortar_board:  *Graduating Year*: ${output[0]}\n\n :brain:  *Expertise*: ${output[1]}`
-            },
-            "accessory": {
-            	"type": "image",
-            	"image_url": "https://static.wikia.nocookie.net/spongebob/images/9/96/The_Two_Faces_of_Squidward_174.png/revision/latest/scale-to-width-down/1000?cb=20200923005328",
-            	"alt_text": "alt text for image"
-            }
-          },
-          {
-            "type": "section",
-            "text": {
-              "type": "plain_text",
-              "text": " ",
-              "emoji": true
-            }
-          },
-          {
-            "type": "actions",
-            "elements": [
-              {
-                "type": "button",
-                "text": {
-                  "type": "plain_text",
-                  "text": "Edit Your Profile"
+        {
+	        "mrkdwn_in": ["text"],
+            "color": "#36a64f",
+            "pretext": "*Here is your current Elicit profile:*",
+            // "text": `:bust_in_silhouette:  *Name*:  ${user_id}`,
+            "fields": [
+                {
+                    "title": ":bust_in_silhouette:  *Name*:",
+                    "value": `-\t  ${user_id}`,
+                    "short": true
                 },
-                "style": "primary",
-                "action_id": "button_edit"
+                {
+                    "title": ":mortar_board:  *Graduating Year*: ",
+                    "value": `-\t  ${output[0]}`,
+                    "short": true
+                },
+                {
+                    "title": ":brain:  *Expertise*:",
+                    "value": `-\t  ${output[1]}`,
+                    "short": false
+
+                },
+                // {
+                //     "title": ":brain:  *Expertise*:",
+                //     "value": `-\t  ${output[1]}`,
+                //     "short": false
+                //
+                // }
+            ],
+            // "thumb_url": "https://static.wikia.nocookie.net/spongebob/images/9/96/The_Two_Faces_of_Squidward_174.png/revision/latest/scale-to-width-down/1000?cb=20200923005328",
+            // "footer": "footer",
+            // "ts": 123456789
+            ,
+            "blocks": [
+              {
+                "type": "actions",
+                "elements": [
+                  {
+                    "type": "button",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "Edit Your Profile"
+                    },
+                    "style": "primary",
+                    "action_id": "button_edit"
+                  }
+                ]
               }
             ]
-          }
-        ]
-      }
-    ]
+        },
+      ],
+      "blocks": [
+        {
+          "type": "actions",
+          "elements": [
+            {
+              "type": "button",
+              "text": {
+                "type": "plain_text",
+                "text": "Edit Your Profile"
+              },
+              "style": "primary",
+              "action_id": "button_edit"
+            }
+          ]
+        }
+      ]
   }
 }
 
