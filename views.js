@@ -92,6 +92,7 @@ const existingUserGreeting = function (user) {
 
 const newUserInformation = async function () {
   topicList = await data.listTopics();
+  groupList = await data.listGroups();
   return {
     type: "modal",
     callback_id: "modal-newuser",
@@ -204,6 +205,41 @@ const newUserInformation = async function () {
         },
       },
       {
+        type: "input",
+        block_id: "select_new_group",
+        optional: true,
+        element: {
+          type: "static_select",
+          placeholder: {
+            type: "plain_text",
+            text: "Select a Topic",
+            emoji: true
+          },
+          action_id: "select_group_newUser",
+          options: groupList
+
+        },
+        label: {
+          type: "plain_text",
+          text: "Select A New Topic",
+          emoji: true
+        }
+      },
+      {
+        type: "input",
+        block_id: "add_new_skill",
+        optional: true,
+        element: {
+          type: "plain_text_input",
+          action_id: "plain_text_input-action"
+        },
+        label: {
+          type: "plain_text",
+          text: "Add A New Skill",
+          emoji: true
+        }
+      },
+      {
         type: "actions",
         elements: [
           {
@@ -221,66 +257,27 @@ const newUserInformation = async function () {
   }
 };
 
-/* ADDING NEW SKILLS */
-
-const addSkill = function (){
+/* UPDATE SKILLS LIST */
+const updateSkillList = async function () {
+  topicList = await data.listTopics();
   return {
-    type: "modal",
-    callback_id: "NewSkill",
-    title: {
-      type: "plain_text",
-      text: "Add A New Skill",
-      emoji: true
+    type: "section",
+    block_id: "select_skill",
+    text: {
+      type: "mrkdwn",
+      text: "List your skills of expertise"
     },
-    submit: {
-      type: "plain_text",
-      text: "Submit",
-      emoji: true
-    },
-    close: {
-      type: "plain_text",
-      text: "Cancel",
-      emoji: true
-    },
-    blocks: [
-      {
-        type: "divider"
+    accessory: {
+      action_id: "select_topics_newuser",
+      type: "multi_static_select",
+      placeholder: {
+        type: "plain_text",
+        text: "Programming Languages, data visualization,..."
       },
-      {
-        dispatch_action: true,
-        type: "input",
-        block_id: "add_new_topic",
-        element: {
-          type: "plain_text_input",
-          dispatch_action_config: {
-            trigger_actions_on: [
-              "on_character_entered"
-            ]
-          },
-          action_id: "add_Topic"
-        },
-        label: {
-          type: "plain_text",
-          text: "Topic of Expertise",
-          emoji: true
-        }
-      },
-      {
-        type: "input",
-        block_id: "add_new_skill",
-        element: {
-          type: "plain_text_input",
-          action_id: "add_Skill"
-        },
-        label: {
-          type: "plain_text",
-          text: "Skill",
-          emoji: true
-        }
-      }
-    ]
-  }
-};
+      option_groups: topicList
+    }
+  };
+}
 
 
 /* QUESTION FORM */
@@ -548,7 +545,7 @@ module.exports = {
   questionForm: questionForm,
   selectUsers: selectUsers,
   newUserInformation: newUserInformation,
-  addSkill: addSkill,
   homepage: homepage,
-  listProfiles: listProfiles
+  listProfiles: listProfiles,
+  updateSkillList: updateSkillList
 }

@@ -71,6 +71,31 @@ const addSkill = async function(topic, skill) {
   });
 }
 
+const listGroups = async function() {
+  // Create new MongoDB client
+  let client = newClient();
+  // Connect client to MongoDB cluster
+  await client.connect();
+  // Get "topics" collection from "app-data" database
+  collection = await client.db("app-data").collection("topics");
+  // Empty array to store option_groups for select menu
+  let option_groups = [];
+  // Get array of distinct topic groups (strings) from "topics" collection
+  let topic_groups = await collection.distinct("group");
+  let options = [];
+  for (group of topic_groups){
+    options.push(
+      {
+        text: {
+          type: 'plain_text',
+          text: group
+        },
+        value: group
+      });
+  }
+  console.log(options);
+  return options;
+}
 
 // Returns all skills sorted by group, formatted as [{ options: [{},...] },...]
 const listTopics = async function() {
@@ -262,5 +287,6 @@ module.exports = {
   listUsers:listUsers,
   addTopicToUser: addTopicToUser,
   findUsersByTopics: findUsersByTopics,
-  addSkill: addSkill
+  addSkill: addSkill,
+  listGroups: listGroups
 }

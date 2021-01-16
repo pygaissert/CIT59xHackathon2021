@@ -80,18 +80,16 @@ app.action('button_no', async({ ack, body, say, client }) => {
 
 // ACTION:   button_createProfile
 // RESPONSE: Show modal to collect user information
-app.action('button_createProfile', async({ ack, body, say, client }) => {
+app.action('button_createProfile', async({ ack, view, body, say, client }) => {
   await ack();
   try {
     // Call the views.open method using one of the built-in WebClients
     const result = await client.views.open({
       // Pass a valid trigger_id within 3 seconds of receiving it
       trigger_id: body.trigger_id,
-      // Pass a valid view_id
-      // View payload
+      //hash: body.view.hash,
       view: await views.newUserInformation()
     });
-    console.log(result);
   } catch (error) {
     console.error(error);
   }
@@ -100,44 +98,40 @@ app.action('button_createProfile', async({ ack, body, say, client }) => {
 // ACTION:   static_select-action
 // RESPONSE: Acknowledge academic year selection
 app.action('select_year', async({ ack, body, say, client }) => {
-  // save result of selected option
-  // const val = JSON.stringify(body['actions'][0]);
-  // confirm value on console
-  // console.log(val);
-  console.log(body.actions[0].selected_option.text.text);
+  // console.log(body.actions[0].selected_option.text.text);
   // Acknowledge static_select
   await ack();
 });
 
-// Acknowledge multi-select skills
-app.action('select_skill', async({ ack, body, say, client }) => {
+// ACTION: multi_static_select-action
+// RESPONSE: Acknowledge multi-select skills
+app.action('select_topics_newuser', async({ ack, body, say, client }) => {
   // print out info
-  console.log(body.actions.selected_options);
+  // console.log(body.actions.selected_options);
   // Acknowledge selection of skill
   await ack();
 });
 
 // ACTION:   button_addSkill
-// RESPONSE: Acknowledge skills selection and open new modal
-app.action('button_addSkill', async({ ack, body, say, client }) => {
-  //console.log(body);
+// RESPONSE: Acknowledge skills selection and open add_skill modal
+app.action('button_addSkill', async({ ack, view, body, say, client }) => {
   // Acknowledge addSkill button
   await ack();
   // open new modal view to add new skill
   try {
-    const result = await client.views.push({
-      trigger_id: body.trigger_id,
-      view: views.addSkill()
+    await client.views.push({
+      //trigger_id: body.trigger_id,
+      // View payload with updated blocks
+      view: views.add(),
+      view_id: body.view.id,
+      private_metadata: body.view.hash
     });
+    //console.log(body.view);
   } catch (error){
     console.error(error);
   }
 });
 
-
-app.action('select_topics_newuser', async({ ack}) => {
-  await ack();
-})
 
 // Acknowledge character input on Add Skills Modal: Topic of expertise
 app.action('add_Topic', async({ ack, body, say, client}) => {
@@ -153,9 +147,8 @@ app.action('add_Skill', async({ ack, body, say, client}) => {
 
 // Submission of introduction modal and extraction of data
 app.view('modal-newuser', async({ ack, view, body, say, client }) => {
-  // print out selected academic year value
-  //console.log(view.state.values.select_year['static_select-action'].selected_option.value);
   let year = view.state.values.select_year['static_select-action'].selected_option.value;
+  // print out selected academic year value
   console.log(year);
   // parse through selected skills
   let skillList = view.state.values.select_skill.select_skill.selected_options;
@@ -179,6 +172,28 @@ app.view('modal-newuser', async({ ack, view, body, say, client }) => {
             type: "mrkdwn",
             text: "Profile successfully added to database!"
           },
+        },
+        {
+          type: "actions",
+          elements: [
+            {
+              type: "button",
+              text: {
+                type: "plain_text",
+                text: "Edit Profile"
+              },
+              style: "primary",
+              action_id: "button_edit"
+            },
+            {
+              type: "button",
+              text: {
+                type: "plain_text",
+                text: "Ask a Question"
+              },
+              action_id: "button_question"
+            }
+          ]
         }
       ]
     });
@@ -193,7 +208,7 @@ app.view('modal-newuser', async({ ack, view, body, say, client }) => {
 });
 
 // Submission of introduction's stacked add modal view
-app.view('NewSkill', async({ ack, view, body, say, client }) => {
+app.view('modal-addskill', async({ ack, response, body, say, client }) => {
   //print group value
   topic = view.state.values.add_new_topic.add_Topic.value;
   console.log(topic);
@@ -201,9 +216,21 @@ app.view('NewSkill', async({ ack, view, body, say, client }) => {
   skill = view.state.values.add_new_skill.add_Skill.value;
   console.log(skill);
   await ack();
-  // Add to MongoDB database
+  //console.log(body.view);
+  console.log(body.view.previous_view_id);
+  //console.log(client.view.private_metadata);
+  console.log(body.view.response_action);
   try {
-    await data.addSkill(topic, skill);
+    // Add to MongoDB database
+    //await data.addSkill(topic, skill);
+  updatedNewUserForm = await views.newUserInformation();
+  updatedNewUserForm.blocks[2] = await views.updateSkillList();
+    await client.views.update({
+      view_id: body.view.previous_view_id,
+      hash: body.view.hash,
+      view: updatedNewUserForm
+      //view.state.values.select_skill.select_skill.selected_options
+    });
   } catch (error) {
     console.log(error);
   }
