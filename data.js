@@ -71,7 +71,6 @@ const addSkill = async function(topic, skill) {
   });
 }
 
-
 // Returns all skills sorted by group, formatted as [{ options: [{},...] },...]
 const listTopics = async function() {
   // Create new MongoDB client
@@ -181,7 +180,6 @@ const listTopics = async function() {
 
   return option_groups;
 }
-
 
 const listUsers = async function() {
   // Create new MongoDB client
