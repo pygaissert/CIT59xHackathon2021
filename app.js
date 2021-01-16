@@ -245,29 +245,34 @@ app.action('select_topics_question', async({ ack, body, action, client }) => {
   if (action.selected_options.length == 0) {
     updatedQuestionForm.blocks[2] = views.noTopicsSelected;
   } else {
-    let updated_topics = parse.getValuesFromOptions(action.selected_options);
+    // Parse values from selected options
+    let updatedTopicsList = parse.getValuesFromOptions(action.selected_options);
     // Get list of Slack IDs associated with the selected topics
-    userList = await data.findUsersByTopics(updated_topics);
-    // Check for empty topic groups
-    if (userList.length == 0) {
-      updatedQuestionForm.blocks[2] = await views.noUsersFound(updated_topics);
+    relatedUserList = await data.findUsersByTopics(updatedTopicsList);
+    // Check if related users were found
+    if (relatedUserList.length == 0) {
+      updatedQuestionForm.blocks[2] = await views.noUsersFound(updatedTopicsList);
     } else {
-      updatedQuestionForm.blocks[2] = await views.usersSelected(userList);
+      updatedQuestionForm.blocks[2] = await views.usersSelected(relatedUserList);
     }
   }
   // Update the Question Form modal (INCOMPLETE)
+  tempForm = await views.questionForm();
+  tempForm.blocks[2] = views.noTopicsSelected;
   try {
     await client.views.update({
+      token: slackBotToken,
       view: updatedQuestionForm,
       view_id: body.view.id,
-      hash: body.view.hash,
+      //hash: body.view.hash,
     });
   } catch (error) {
     console.log(error);
   }
 });
 
-
+// ACTION: User selects related users to direct their question at
+// RESPONSE: Acknowledge action
 app.action('select_users_question', async({ack}) => {
   await ack();
   console.log("Acknowledged - User Selected")

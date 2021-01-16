@@ -23,6 +23,7 @@
     "dotenv": "^8.2.0",
     "localtunnel": "^2.0.1",
     "mongodb": "^3.6.3",
-    "node-sass": "^5.0.0"
+    "node-sass": "^5.0.0",
+    "window": "^4.2.7"
   }
 }

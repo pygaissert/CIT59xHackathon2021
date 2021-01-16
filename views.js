@@ -222,7 +222,7 @@ const newUserInformation = async function (channel, timestamp) {
   }
 };
 
-/* ADDING NEW SKILLS */
+/* ADDING NEW SKILLS TO ELICIT */
 
 const addSkill = function (){
   return {
@@ -330,14 +330,14 @@ const questionForm = async function () {
       			block_id: "select_topics_question",
       			text: {
       				type: "mrkdwn",
-      				text: "Select related topic"
+      				text: "Select related topic(s)"
       			},
       			accessory: {
       				action_id: "select_topics_question",
       				type: "multi_static_select",
       				placeholder: {
       					type: "plain_text",
-      					text: "Select question related skills"
+      					text: "No topics selected"
       				},
               option_groups: topicList
       			},
@@ -418,14 +418,14 @@ const usersSelected = function(userList) {
     block_id: "select_users_question",
     text: {
       type: "plain_text",
-      text: "Select classmates (optional)"
+      text: "Optional: Select classmate(s)"
     },
     accessory: {
       action_id: "select_users_question",
       type: "multi_static_select",
       placeholder: {
         type: "plain_text",
-        text: "Select here"
+        text: "No classmates selected"
       },
       option_groups: userList
     }
