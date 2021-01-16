@@ -121,62 +121,19 @@ const newUserInformation = async function () {
       },
       // Static select button for student status
       {
-        type: "section",
-        block_id: "select_year",
-        text: {
-          type: "mrkdwn",
-          text: "Academic Status"
-        },
-        accessory: {
-          type: "static_select",
+        type: "input",
+        element: {
+          type: "plain_text_input",
+          action_id: "graduation_year",
           placeholder: {
             type: "plain_text",
-            text: "year",
-            emoji: true
-          },
-          options: [
-            {
-              text: {
-                type: "plain_text",
-                text: "First Year",
-                //emoji: true
-              },
-              value: "First Year"
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "Second Year",
-                //emoji: true
-              },
-              value: "Second Year"
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "Submatriculate",
-                //emoji: true
-              },
-              value: "Submatriculate"
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "Part-Time",
-                //emoji: true
-              },
-              value: "Part-Time"
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "Alum",
-                //emoji: true
-              },
-              value: "Alum"
-            }
-          ],
-          action_id: "select_year"
+            text: "ie: 2021"
+          }
+        },
+        label: {
+          type: "plain_text",
+          text: "Graduation Year",
+          emoji: true
         }
       },
       // List skills from a external multi-select

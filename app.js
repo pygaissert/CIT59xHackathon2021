@@ -95,11 +95,10 @@ app.action('button_createProfile', async({ ack, view, body, say, client }) => {
   }
 });
 
-// ACTION:   static_select-action
-// RESPONSE: Acknowledge academic year selection
-app.action('select_year', async({ ack, body, say, client }) => {
-  // console.log(body.actions[0].selected_option.text.text);
-  // Acknowledge static_select
+// ACTION:   plain-text-input-action
+// RESPONSE: Acknowledge graduation year selection
+app.action('graduation_year', async({ ack, body, say, client }) => {
+  // Acknowledge input
   await ack();
 });
 
@@ -203,11 +202,6 @@ app.view('modal-newuser', async({ ack, view, body, say, client }) => {
         }
       ]
     });
-    // await client.chat.update({
-    //   channel: body.channel.id,
-    //   ts: body.container.message_ts,
-    //   blocks: views.existingUserGreeting(message.user)
-    // })
   } catch (error) {
     console.log(error);
   }
@@ -237,7 +231,6 @@ app.view('modal_addskill', async({ ack, view, response, body, say, client }) => 
     clearNewUserInfo.blocks[2] = await views.clearSkillList();
     updateNewUserInfo = await views.newUserInformation();
     updateNewUserInfo.blocks[2] = await views.updateSkillList(selected_skill_list);
-    //console.log(updateNewUserInfo.blocks);
     await client.views.update({
       view_id: body.view.root_view_id,
       hash: body.view.private_metadata.split('_')[0],
