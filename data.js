@@ -23,7 +23,9 @@ const userExists = async function(userId) {
   client.close();
 }
 
-const addUser = async function(userName, userId, userYear, userSkills) {
+
+// Add user id, name, and year into users collection
+const addUser = async function(userName, userId, userYear) {
   // Create new MongoDB client
   let client = newClient();
   // Connect client to MongoDB cluster
@@ -33,8 +35,7 @@ const addUser = async function(userName, userId, userYear, userSkills) {
   user = {
     name: userName,
     slack_id: userId,
-    year: userYear,
-    skill: userSkills
+    year: userYear
   }
   await collection.insertOne(user, {w: 1}, function(err, doc) {
     if (err) {
@@ -48,7 +49,53 @@ const addUser = async function(userName, userId, userYear, userSkills) {
   });
 }
 
-const addSkill = async function(topic, skill) {
+// Add user id and skill (topic) into topics-users collection
+const addUserSkill = async function(userId, skillList) {
+  // Create new MongoDB client
+  let client = newClient();
+  // Connect client to MongoDB cluster
+  await client.connect();
+  // Get "users" collection from "app-data" database
+  collection = await client.db("app-data").collection("topics-users");
+  for (skill of skillList) {
+    topic = {
+      user: userId,
+      topic: skill
+    }
+    await collection.insertOne(topic, {w: 1}, function(err, doc) {
+      if (err) {
+        console.log(err);
+        process.exit(0);
+      }
+      let saved = doc.ops[0];
+      console.log(`${saved.user}: ${saved.topic})`);
+  }
+    // Disconnect client from MongoDB cluster
+    client.close();
+  });
+}
+
+// format selected skills into options block for update NewUserView
+const formatSkillList = async function(list) {
+  console.log()
+  let selectedSkills = [];
+  for (i = 0; i < list.length; i++){
+    selectedSkills.push(
+      {
+        text: {
+          type: "plain_text",
+          text: list[i],
+          emoji: true
+        },
+        value: list[i]
+      }
+    );
+  }
+  return selectedSkills;
+}
+
+// Adds user inputted skill into database
+const addNewSkill = async function(topic, skill) {
   //create new MongoDB client
   let client = new MongoClient(uri, { useUnifiedTopology: true });
   // Connect client to MongoDB cluster
@@ -69,6 +116,36 @@ const addSkill = async function(topic, skill) {
     // Disconnect client from MongoDB cluster
     client.close();
   });
+}
+
+// Returns all skills sorted by group, formatted as [{ options: [{},...] },...]
+const listGroups = async function() {
+  // Create new MongoDB client
+  let client = newClient();
+  // Connect client to MongoDB cluster
+  await client.connect();
+  // Get "topics" collection from "app-data" database
+  collection = await client.db("app-data").collection("topics");
+  // Empty array to store option_groups for select menu
+  let options = [];
+  // Get array of distinct topic groups (strings) from "topics" collection
+  let topic_groups = await collection.distinct("group");
+  // Iterate over the topic groups
+  for (group of topic_groups) {
+    options.push(
+      {
+        text: {
+          type: 'plain_text',
+          text: group
+        },
+        value: group
+      }
+    );
+  }
+  return options;
+  console.log(options);
+  // Disconnect client from MongoDB cluster
+  client.close();
 }
 
 
@@ -347,12 +424,15 @@ const getAllProfile = async function(){
 
 module.exports = {
   addUser: addUser,
+  addUserSkill: addUserSkill,
   userExists: userExists,
   listTopics:listTopics,
   listUsers:listUsers,
   addTopicToUser: addTopicToUser,
   findUsersByTopics: findUsersByTopics,
-  addSkill: addSkill,
+  addNewSkill: addNewSkill,
   getProfileById: getProfileById,
-  getAllProfile: getAllProfile
+  getAllProfile: getAllProfile,
+  listGroups: listGroups,
+  formatSkillList: formatSkillList
 }

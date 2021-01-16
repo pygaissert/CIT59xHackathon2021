@@ -88,6 +88,7 @@ const existingUserGreeting = function (user) {
   }
 };
 
+
 /* NEW USER FORM */
 
 const newUserInformation = async function () {
@@ -120,62 +121,20 @@ const newUserInformation = async function () {
       },
       // Static select button for student status
       {
-        type: "section",
+        type: "input",
         block_id: "select_year",
-        text: {
-          type: "mrkdwn",
-          text: "Academic Status"
-        },
-        accessory: {
-          type: "static_select",
+        element: {
+          type: "plain_text_input",
+          action_id: "graduation_year",
           placeholder: {
             type: "plain_text",
-            text: "year",
-            emoji: true
-          },
-          options: [
-            {
-              text: {
-                type: "plain_text",
-                text: "First Year",
-                //emoji: true
-              },
-              value: "First Year"
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "Second Year",
-                //emoji: true
-              },
-              value: "Second Year"
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "Submatriculate",
-                //emoji: true
-              },
-              value: "Submatriculate"
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "Part-Time",
-                //emoji: true
-              },
-              value: "Part-Time"
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "Alum",
-                //emoji: true
-              },
-              value: "Alum"
-            }
-          ],
-          action_id: "select_year"
+            text: "ie: 2021"
+          }
+        },
+        label: {
+          type: "plain_text",
+          text: "Graduation Year",
+          emoji: true
         }
       },
       // List skills from a external multi-select
@@ -223,10 +182,12 @@ const newUserInformation = async function () {
 
 /* ADDING NEW SKILLS */
 
-const addSkill = function (){
+const addSkill = async function (hash, skillList) {
+  let topicList = await data.listGroups();
   return {
     type: "modal",
-    callback_id: "NewSkill",
+    private_metadata: `${hash}_${skillList}`,
+    callback_id: "modal_addskill",
     title: {
       type: "plain_text",
       text: "Add A New Skill",
@@ -243,38 +204,36 @@ const addSkill = function (){
       emoji: true
     },
     blocks: [
+      // List skills from a external static-select
       {
-        type: "divider"
-      },
-      {
-        dispatch_action: true,
         type: "input",
-        block_id: "add_new_topic",
+        block_id: "add_Topic",
         element: {
-          type: "plain_text_input",
-          dispatch_action_config: {
-            trigger_actions_on: [
-              "on_character_entered"
-            ]
+          type: "static_select",
+          placeholder: {
+            type: "plain_text",
+            text: "CS Concepts...",
+            emoji: true
           },
-          action_id: "add_Topic"
+          action_id: "add_Topic",
+          options: topicList
         },
         label: {
           type: "plain_text",
-          text: "Topic of Expertise",
+          text: "Select Topic of Expertise",
           emoji: true
         }
       },
       {
         type: "input",
-        block_id: "add_new_skill",
+        block_id: "add_Skill",
         element: {
           type: "plain_text_input",
           action_id: "add_Skill"
         },
         label: {
           type: "plain_text",
-          text: "Skill",
+          text: "Add A New Skill",
           emoji: true
         }
       }
@@ -282,6 +241,43 @@ const addSkill = function (){
   }
 };
 
+/* UPDATE SKILL LIST VIA CLEARING BLOCK 2 */
+const clearSkillList = async function() {
+  let topicList = await data.listTopics();
+  return {
+    // List skills from a external multi-select
+    type: "section",
+    block_id: "select_skill",
+    text: {
+      type: "mrkdwn",
+      text: "List your skills of expertise"
+    }
+  }
+}
+
+/* UPDATE SKILL LIST */
+const updateSkillList = async function(selectedList) {
+  let topicList = await data.listTopics();
+  return {
+    // List skills from a external multi-select
+    type: "section",
+    block_id: "select_skill",
+    text: {
+      type: "mrkdwn",
+      text: "List your skills of expertise"
+    },
+    accessory: {
+      action_id: "select_topics_newuser",
+      type: "multi_static_select",
+      placeholder: {
+        type: "plain_text",
+        text: "Programming Languages, data visualization,..."
+      },
+      initial_options: selectedList,
+      option_groups: topicList
+    }
+  }
+}
 
 /* QUESTION FORM */
 
@@ -857,5 +853,8 @@ module.exports = {
   addSkill: addSkill,
   homepage: homepage,
   showUserProfile: showUserProfile,
-  showAllProfiles:showAllProfiles
+  showAllProfiles:showAllProfiles,
+  listProfiles: listProfiles,
+  clearSkillList: clearSkillList,
+  updateSkillList: updateSkillList
 }
