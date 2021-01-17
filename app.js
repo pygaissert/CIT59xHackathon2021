@@ -187,7 +187,7 @@ app.view('modal-newuser', async({ ack, view, body, say, client }) => {
   if (year > 1900 && year < 2040){
     // acknowlege modal submission
     await ack();
-    // parse through selected skills
+    parse through selected skills
     let skills = parse.getValuesFromOptions(values.select_topics_newuser.select_topics_newuser.selected_options);
     console.log(skills);
     try {
