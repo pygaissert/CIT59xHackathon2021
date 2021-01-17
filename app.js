@@ -639,58 +639,15 @@ app.command('/my-profile', async ({ command, ack, say, body, client}) => {
   await ack();
 
   try {
-  //   await say({
-  //     "blocks": [
-  //     {
-  //       "type": "header",
-  //       "text": {
-  //         "type": "plain_text",
-  //         "text": "This is a header block",
-  //         "emoji": true
-  //       }
-  //     }
-  //   ]
-  // });
 
-  // TODO change this to user_id
-  // await views.showUserProfile(command.user_id)
-
+    // TODO change this to user_id
+    // await views.showUserProfile(command.user_id)
     // write new message, show user's own profile
     const result = await say(
       await views.showUserProfile("U01JMNX5NSF")
-    );
+      // await views.showUserProfile(body.user_id)
 
-    // console.log(result);
-    // console.log("!!!!!!!!");
-    // await client.chat.update({
-    //   // Channel ID of the message
-    //   channel: result.channel,
-    //   // Timestamp of the message containing the button
-    //   ts: result.ts,
-    //   blocks: [
-    //     {
-    //       type: "section",
-    //       text: {
-    //         type: "mrkdwn",
-    //         text: "Then let's get you started!"
-    //       },
-    //     },
-    //     {
-    //       type: "actions",
-    //       elements: [
-    //         {
-    //           type: "button",
-    //           text: {
-    //             type: "plain_text",
-    //             text: "Click to create your profile!"
-    //           },
-    //           style: "primary",
-    //           action_id: "button_createProfile"
-    //         }
-    //       ]
-    //     }
-    //   ]
-    // });
+    );
   } catch (error){
     console.error(error);
   }
@@ -735,16 +692,33 @@ app.action('button_message_by_profile',async({action, ack, body, client}) =>{
       			type: "section",
       			text: {
       				type: "mrkdwn",
-      				text: `*Are you sure you want to send a message to ${dm_id}?*`
+      				text: `*:speech_balloon:  Are you sure you want to send a message to ${dm_id}?*`
       			}
       		},
       		{
       			type: "section",
       			text: {
       				type: "mrkdwn",
-      				text: `:bust_in_silhouette:  *${dm_id}*\n\n :mortar_board:  *${userInfo[0]}*\n\n :brain:  ${userInfo[1]}`
+      				text: `:bust_in_silhouette:  *<@${dm_id}>*\n\n :mortar_board:  *${userInfo[0]}*\n\n :brain:  ${userInfo[1]}`
       			}
-      		}
+      		},
+          {
+            type: "divider"
+          },
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: `:gift_heart:  We will start a groupchat on your behalf and make introduction by showing a preview of your profile!`
+            }
+          },
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: `Example: \n\nHi Daniel, \nYour fellow classmate John wants to connect with you, \nhere is his profile! ...`
+            }
+          }
       	]
       }
     });
@@ -765,7 +739,7 @@ app.view('dm_rusure', async({ ack, body, view, client }) => {
   // Parse the view_submission for the question, the topics, and the users
   try {
 
-    // confirm message
+    // confirm sending message
     // open modal view to ask user
     await client.views.update({
       view_id: view.root_view_id,
@@ -788,9 +762,14 @@ app.view('dm_rusure', async({ ack, body, view, client }) => {
             type: "section",
             text: {
               type: "mrkdwn",
-              text: `*Message sent to ${dm_to_id}*`
+              text: `*:postbox:  Message sent to <@${dm_to_id}>!!!*`
             }
-          }
+          },
+          {
+    			type: "image",
+    			image_url: "https://media1.tenor.com/images/b72facfc90455a2dc6985a49c87eafac/tenor.gif?itemid=7518152",
+    			alt_text: "inspiration"
+    		}
         ]
       }
     });
@@ -798,10 +777,10 @@ app.view('dm_rusure', async({ ack, body, view, client }) => {
     // send message
     let result = await client.conversations.open({
       token: slackBotToken,
-      users: body.user.id //TO cahnge this to group
+      users: body.user.id // TODO change this to comma seperated user_id for group message
     });
 
-    // TODO change this
+    // TODO change user_id implementation
     let userProfile = await data.getProfileById("U01JMNSEL75");
 
     let msg = await client.chat.postMessage({
@@ -837,10 +816,37 @@ app.view('dm_rusure', async({ ack, body, view, client }) => {
   }
 });
 
+// TODO: IMPLEMENTING edit profile
+app.action('button_edit',async({action, ack, body, client}) =>{
+  // Acknowledge the view_submission
+  await ack();
+  console.log("Acknowledged - EDIT!");
 
+  try {
+    let result = await editProfile({action, ack, body, client });
 
-// IMPLEMENTING edit profile
+  } catch (error){
+    console.error(error);
+  }
+});
 
+async function editProfile({action, ack, body, client }) {
+
+  // await views.editUserInformation("U01JMNX5NSF", body.channel.id, body.container.message_ts);
+
+  // Open the modal for editing an EliCIT profile
+  const result = await client.views.open({
+    // Pass a valid trigger_id within 3 seconds of receiving it
+    trigger_id: body.trigger_id,
+    // Pass a valid view_id
+    // View payload
+
+    // TODO change user_id
+    // view: await views.editUserInformation(body.user_id, body.channel.id, body.container.message_ts)
+    view: await views.editUserInformation("U01JMNX5NSF", body.channel.id, body.container.message_ts)
+  });
+
+}
 
 
 // STARTS THE APP

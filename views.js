@@ -101,7 +101,7 @@ const newUserInformation = async function (channel, timestamp) {
     callback_id: "modal-newuser",
     title: {
       type: "plain_text",
-      text: "Welcome to Elicit!",
+      text: "Welcome to EliCIT!",
       emoji: true
     },
     submit: {
@@ -549,7 +549,7 @@ const usersFound = function(userList) {
 
 
 // basic fucntions
-
+// homepage view
 const homepage = function (event){
   return {
     "type": "home",
@@ -581,7 +581,7 @@ const homepage = function (event){
   			"type": "header",
   			"text": {
   				"type": "plain_text",
-  				"text": "Introducing Elicit - 100% THAT app you've been looking for! :wink:",
+  				"text": "Introducing EliCIT - 100% THAT app you've been looking for! :wink:",
   				"emoji": true
   			}
   		},
@@ -600,7 +600,7 @@ const homepage = function (event){
         "type": "header",
         "text": {
           "type": "plain_text",
-          "text": "What is Elicit?",
+          "text": "What is EliCIT?",
           "emoji": true
         }
       },
@@ -608,14 +608,14 @@ const homepage = function (event){
   			"type": "section",
   			"text": {
   				"type": "mrkdwn",
-  				"text": "-\t   Elicit harness the collective skills and experiences of the MCIT student body so that no problem will ever go unsolved.\t\t"
+  				"text": "-\t   EliCIT harness the collective skills and experiences of the MCIT student body so that no problem will ever go unsolved.\t\t"
   			}
   		},
   		{
   			"type": "section",
   			"text": {
   				"type": "mrkdwn",
-  				"text": "-\t   Whenever you have a burning question about JavaScript :jigsaw:, Machine Learning :robot_face: , Graphic Design :art: , the healthcare industry :hospital: , editing a cover letter :memo: , or even general organization techniques :busts_in_silhouette: , Elicit will help direct your question to one of your many benevolent classmates."
+  				"text": "-\t   Whenever you have a burning question about JavaScript :jigsaw:, Machine Learning :robot_face: , Graphic Design :art: , the healthcare industry :hospital: , editing a cover letter :memo: , or even general organization techniques :busts_in_silhouette: , EliCIT will help direct your question to one of your many benevolent classmates."
   			},
   			"accessory": {
   				"type": "image",
@@ -638,7 +638,7 @@ const homepage = function (event){
         "type": "header",
         "text": {
           "type": "plain_text",
-          "text": "How to use Elicit?",
+          "text": "How to use EliCIT?",
           "emoji": true
         }
       },
@@ -664,7 +664,7 @@ const homepage = function (event){
   			"type": "section",
   			"text": {
   				"type": "mrkdwn",
-  				"text": "*About Elicit:*\n\n Elicit is a student project at the CIT59x 2021 winter hackathon. Driven by the hope to better connect and foster the MCIT student community, the Elicit team hope to create application that facilitates and encourages students to be each other's greatest allies."
+  				"text": "*About EliCIT:*\n\n EliCIT is a student project at the CIT59x 2021 winter hackathon. Driven by the hope to better connect and foster the MCIT student community, the EliCIT team hope to create application that facilitates and encourages students to be each other's greatest allies."
   			}
   		},
   		{
@@ -701,116 +701,7 @@ const homepage = function (event){
 const showUserProfile = async function(user_id) {
   let output = await data.getProfileById(user_id);
 
-  // // console.log(output);
-  // return {
-  //   "blocks": [
-  //     {
-  // 			"type": "header",
-  // 			"text": {
-  // 				"type": "plain_text",
-  // 				"text": "Your Current Elicit Profile:",
-  // 				"emoji": true
-  // 			}
-  // 		},
-  //     {
-  //       "type": "section",
-  //       "text": {
-  //         "type": "mrkdwn",
-  //         // TO-DO <@${user_id}>
-  //         "text": `:bust_in_silhouette:  *Name*: ${user_id}\n\n :mortar_board:  *Graduating Year*: ${output[0]}\n\n :brain:  *Expertise*: ${output[1]}`
-  //       },
-  // 			// "accessory": {
-  // 			// 	"type": "image",
-  // 			// 	"image_url": url,
-  // 			// 	"alt_text": "alt text for image"
-  // 			// }
-  //     },
-  //     {
-  //       "type": "section",
-  //       "text": {
-  //         "type": "plain_text",
-  //         "text": " ",
-  //         "emoji": true
-  //       }
-  //     },
-  //     {
-  //       "type": "actions",
-  //       "elements": [
-  //         {
-  //           "type": "button",
-  //           "text": {
-  //             "type": "plain_text",
-  //             "text": "Edit Your Profile"
-  //           },
-  //           "style": "primary",
-  //           "action_id": "button_edit"
-  //         }
-  //       ]
-  //     }
-  //   ]
-  // }
-
-
   return{
-    // "attachments": [
-    //   {
-    //     "color": "#f2c744",
-    //     "blocks": [
-    //       {
-    //       	"type": "header",
-    //       	"text": {
-    //       		"type": "plain_text",
-    //       		"text": "Your Current Elicit Profile:",
-    //       		"emoji": true
-    //       	}
-    //       },
-    //       {
-    //         "type": "section",
-    //         "text": {
-    //           "type": "plain_text",
-    //           "text": " ",
-    //           "emoji": true
-    //         }
-    //       },
-    //       {
-    //         "type": "section",
-    //         "text": {
-    //           "type": "mrkdwn",
-    //           // TO-DO <@${user_id}>
-    //           "text": `:bust_in_silhouette:  *Name*: ${user_id}\n\n :mortar_board:  *Graduating Year*: ${output[0]}\n\n :brain:  *Expertise*: ${output[1]}`
-    //         },
-    //         "accessory": {
-    //         	"type": "image",
-    //         	"image_url": "https://static.wikia.nocookie.net/spongebob/images/9/96/The_Two_Faces_of_Squidward_174.png/revision/latest/scale-to-width-down/1000?cb=20200923005328",
-    //         	"alt_text": "alt text for image"
-    //         }
-    //       },
-    //       {
-    //         "type": "section",
-    //         "text": {
-    //           "type": "plain_text",
-    //           "text": " ",
-    //           "emoji": true
-    //         }
-    //       },
-    //       {
-    //         "type": "actions",
-    //         "elements": [
-    //           {
-    //             "type": "button",
-    //             "text": {
-    //               "type": "plain_text",
-    //               "text": "Edit Your Profile"
-    //             },
-    //             "style": "primary",
-    //             "action_id": "button_edit"
-    //           }
-    //         ]
-    //       }
-    //     ]
-    //   }
-    // ]
-
     "attachments": [
         {
 	        // "mrkdwn_in": ["text"],
@@ -820,7 +711,7 @@ const showUserProfile = async function(user_id) {
             "fields": [
                 {
                     "title": ":bust_in_silhouette:  *Name*:",
-                    "value": `-\t  ${user_id}`,
+                    "value": `-\t  <@${user_id}>`,
                     "short": true
                 },
                 {
@@ -834,16 +725,7 @@ const showUserProfile = async function(user_id) {
                     "short": false
 
                 }
-                // {
-                //     "title": ":brain:  *Expertise*:",
-                //     "value": `-\t  ${output[1]}`,
-                //     "short": false
-                //
-                // }
             ],
-            // "thumb_url": "https://static.wikia.nocookie.net/spongebob/images/9/96/The_Two_Faces_of_Squidward_174.png/revision/latest/scale-to-width-down/1000?cb=20200923005328",
-            // "footer": "footer",
-            // "ts": 123456789
 
         },
         {
@@ -878,7 +760,7 @@ const showUserProfile = async function(user_id) {
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": "*Here is your current Elicit profile:*"
+            "text": "*Here is your current EliCIT profile:*"
           }
         }
       ]
@@ -898,7 +780,7 @@ const showAllProfiles = async function() {
     "type": "header",
     "text": {
       "type": "plain_text",
-      "text": "Welcome to the Elicit community!",
+      "text": "Welcome to the EliCIT community!",
       "emoji": true
     }
   },
@@ -927,7 +809,7 @@ const showAllProfiles = async function() {
         // TODO
         // <@${user[0]}>
         // "text": `:bust_in_silhouette:  Name: *${user[0]}*\n\n :mortar_board:  Graduating Year: *${user[1]}*\n\n :brain:  Expertise: *${user[2]}*`
-        "text": `:bust_in_silhouette:  *${user[0]}*\n\n :mortar_board:  *${user[1]}*`
+        "text": `:bust_in_silhouette:  *<@${user[0]}>*\n\n :mortar_board:  *${user[1]}*`
 			},
 			"accessory": {
 				"type": "button",
@@ -964,7 +846,7 @@ const showAllProfiles = async function() {
   return {
     	"title": {
     		"type": "plain_text",
-    		"text": "Elicit Profiles",
+    		"text": "EliCIT Profiles",
     		"emoji": true
     	},
     	// "submit": {
@@ -982,7 +864,104 @@ const showAllProfiles = async function() {
   }
 }
 
-
+//
+// // edit an existing user infomation
+// const editUserInformation = async function (user_id, channel, timestamp) {
+//   let topicList = await data.listTopics();
+//   let userExistingSkillList = await data.getProfileByIdForEdit(user_id);
+//   let uExistYear = await data.getProfileById(user_id);
+//
+//   console.log(" Reaching list");
+//   console.log(uExistYear[0]);
+//   console.log(userExistingSkillList);
+//
+//
+//   return {
+//     type: "modal",
+//     private_metadata: `${channel}_${timestamp}`,
+//     callback_id: "modal_edit",
+//     title: {
+//       type: "plain_text",
+//       text: "EliCIT",
+//       emoji: true
+//     },
+//     submit: {
+//       type: "plain_text",
+//       text: "Submit",
+//       emoji: true
+//     },
+//     close: {
+//       type: "plain_text",
+//       text: "Cancel",
+//       emoji: true
+//     },
+//     blocks: [
+//       {
+//         type: "section",
+//         text: {
+//           type: "mrkdwn",
+//           text: "Edit your EliCIT profile :bust_in_silhouette:"
+//         }
+//       },
+//       // Static select button for student status
+//       {
+//         type: "input",
+//         block_id: "edit_year",
+//         element: {
+//           type: "plain_text_input",
+//           action_id: "graduation_year",
+//           placeholder: {
+//             type: "plain_text",
+//             text: `Year on file: ${uExistYear[0]}`
+//           },
+//           initial_value: `${uExistYear[0]}`
+//         },
+//         label: {
+//           type: "plain_text",
+//           text: "Graduation Year  :mortar_board:",
+//           emoji: true
+//         }
+//       },
+//       // List skills from a external multi-select
+//       {
+//         type: "section",
+//         block_id: "edit_topics_newuser",
+//         text: {
+//           type: "mrkdwn",
+//           text: "List your skills of expertise :memo:"
+//         },
+//         accessory: {
+//           action_id: "select_topics_edit",
+//           type: "multi_static_select",
+//           placeholder: {
+//             type: "plain_text",
+//             text: "Programming Languages, data visualization, ..."
+//           },
+//           initial_options: userExistingSkillList,
+//           option_groups: topicList,
+//         }
+//       },
+//       {
+//         type: "section",
+//         block_id: "add_new_skill",
+//         text: {
+//           type: "mrkdwn",
+//           text: "Don't see your skills listed above?"
+//         },
+//         accessory: {
+//           type: "button",
+//           text: {
+//             type: "plain_text",
+//             text: "Add a new skill",
+//             emoji: true
+//           },
+//           value: "add_new_skill",
+//           action_id: "button_addSkill"
+//         }
+//       }
+//     ]
+//   }
+// };
 
 
 
@@ -1003,5 +982,5 @@ module.exports = {
   usersFound: usersFound,
   noUsersFound: noUsersFound,
   noTopicsSelected: noTopicsSelected,
-  editUserInformation: editUserInformation
+  // editUserInformation: editUserInformation
 }
