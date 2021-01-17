@@ -349,12 +349,12 @@ const listUsers = async function() {
 // FUNCTION: Removes a topic-user pairing from the "topics-users" collection
 // ARGUMENTS: topicName (String), userID ()
 const removeTopicFromUser = async function(topicName, userID) {
+  let client = newClient();
   try {
-    let client = newClient();
     await client.connect();
     let connection = client.db("app-data").collection("topics-users");
     // Removes a document from "topics-users" with the matching topic and user
-    let deleteResult = await connection.deleteOne({ "topic": topic, "user:": user });
+    let deleteResult = await connection.deleteOne({ "topic": topicName, "user:": userID });
     if (deleteResult.deletedCount === 1) {
       console.log("Successfully deleted one document.");
     } else {

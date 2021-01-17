@@ -375,7 +375,7 @@ app.view('modal-editProfile', async({ ack, view, body, say, client }) => {
       console.log(`Delete: ${toDelete}`);
       // Remove skill in toDelete array from "topics-users" database
       for (skill of toDelete){
-        /* PHILIPP'S CODE */
+        await data.removeTopicFromUser(skill, body.user.id);
       }
       // Determine what skills to add
       let toAdd = await parse.toAddSkillList(toKeep, new_skills);
