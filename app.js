@@ -306,40 +306,51 @@ app.action('select_topics_question', async({ ack, body, action, client }) => {
   // Acknowledge the selection
   await ack();
   console.log("Acknowledged - Topic Selected");
-  // Create a new identical question form view
-  updatedQuestionForm = await views.questionForm();
-  // Check if there are topics selected
+  // Create a new identical Question Form view
+  let updatedQuestionForm = await views.questionForm();
+  // Check any topics were selected
   if (action.selected_options.length == 0) {
-    // Give the updated view an empty 3rd block
+    // If there are no topics selected, give the updated view an empty 3rd block
     updatedQuestionForm.blocks[2] = views.noTopicsSelected;
   } else {
-    // Parse selected topics from selected options
-    updatedTopicsList = parse.getValuesFromOptions(action.selected_options);
-    // Get list of Slack IDs associated with the selected topics
-    relatedUserList = await data.findUsersByTopics(updatedTopicsList);
-    // Check if related users were found
+    // If there are still topics selected...
+    // Parse an array of selected topics from action.selected_options
+    let updatedTopicsList = parse.getValuesFromOptions(action.selected_options);
+    // Get list of users associated with the selected topics
+    let relatedUserList = await data.findUsersByTopics(updatedTopicsList);
+    // Check if any users were found
     if (relatedUserList.length == 0) {
+      // If no users were found, give the updated view a 3rd block with a message
       updatedQuestionForm.blocks[2] = await views.noUsersFound(updatedTopicsList);
     } else {
+      // If users were found...
+      // Give the updated view a 3rd block with a multi-select menu for selecting users
       updatedQuestionForm.blocks[2] = await views.usersFound(relatedUserList);
-      // Check if there were users already selected
+      // Check if there were users already selected before
       if (body.view.state.values.select_users_question) {
-          // Get the list of selected users as JSON object
-          selectedUsers = body.view.state.values.select_users_question.select_users_question.selected_options;
-          initialUsers = [];
-          selectedUsers.forEach( (user) => {
+          // If users were already selected...
+          // Get the list of previously selected users as a JSON object
+          previouslySelectedUsers = body.view.state.values.select_users_question.select_users_question.selected_options;
+          // This array will hold the initial_options for the multi-select menu
+          updatedSelectedUsers = [];
+          // For each of the previously selected users...
+          previouslySelectedUsers.forEach( (user) => {
+            // Check if they are still in the selectable users, given the selected topic(s)
             updatedQuestionForm.blocks[2].accessory.option_groups.forEach( (group) => {
-              if (initialUsers.includes(user)) {
+              // Ensure that there are no duplicates in the initial_options
+              if (updatedSelectedUsers.includes(user)) {
                 return;
               }
+              // If a previously selected user is related to any of the currently selected topics...
               if (parse.getValuesFromOptions(group.options).includes(user.value)) {
-                initialUsers.push(user);
+                // Add them to the array
+                updatedSelectedUsers.push(user);
               }
             });
           });
-          console.log(initialUsers);
-          if (initialUsers.length != 0) {
-            updatedQuestionForm.blocks[2].accessory.initial_options = initialUsers;
+          // If the array is not empty
+          if (updatedSelectedUsers.length != 0) {
+            updatedQuestionForm.blocks[2].accessory.initial_options = updatedSelectedUsers;
           }
         }
       }

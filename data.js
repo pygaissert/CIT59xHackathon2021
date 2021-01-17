@@ -1,13 +1,19 @@
 // data.js
-// This is a module for interacting with the MongoDB database
+// This is a module for interacting with the MongoDB cluster
 
-// FOR INITIALIZING MONGODB CLIENTS
+// Import MongoClient class from mongodb module
 const MongoClient = require('mongodb').MongoClient;
+
+// Import Uniform Resource Identifier for MongoDB cluster from .env file
 const uri = process.env.MONGODB_CONNECTION;
+
+// FUNCTION: Returns a new MongoClient object
 const newClient = function() {
   return new MongoClient(uri, { useUnifiedTopology: true });
 }
 
+// FUNCTION: Checks if a user is already in "users" collection
+// ARGUMENTS: userId (String) - Slack ID
 const userExists = async function(userId) {
   // Create new MongoDB client
   let client = newClient();
@@ -24,7 +30,8 @@ const userExists = async function(userId) {
 }
 
 
-// Add user id, name, and year into users collection
+// FUNCTION: Adds a new user to the "users" collection
+// ARGUMENTS: userName (String), userId (String), userYear (String)
 const addUser = async function(userName, userId, userYear) {
   // Create new MongoDB client
   let client = newClient();
@@ -49,7 +56,8 @@ const addUser = async function(userName, userId, userYear) {
   });
 }
 
-// Add user id and skill (topic) into topics-users collection
+// FUNCTION: Adds topic-user pairings to the "topics-users" collection
+// ARGUMENTS: userId (String), skillList (String[])
 const addUserSkill = async function(userId, skillList) {
   // Create new MongoDB client
   let client = newClient();
@@ -75,7 +83,8 @@ const addUserSkill = async function(userId, skillList) {
   };
 }
 
-// format selected skills into options block for update NewUserView
+// FUNCTION: Formats selected skills into options JSON object
+// ARGUMENTS: list (String[])
 const formatSkillList = async function(list) {
   console.log()
   let selectedSkills = [];
@@ -94,13 +103,13 @@ const formatSkillList = async function(list) {
   return selectedSkills;
 }
 
-// Adds user inputted skill into database
+// FUNCTION: Adds user-inputted skills to the "topics" collection
 const addNewSkill = async function(topic, skill) {
   //create new MongoDB client
   let client = new MongoClient(uri, { useUnifiedTopology: true });
   // Connect client to MongoDB cluster
   await client.connect();
-  // Get "users" collection from "test_slack" database
+  // Get "users" collection from "app-data" database
   collection = await client.db("app-data").collection("topics");
   topic = {
     name: skill,
@@ -118,7 +127,7 @@ const addNewSkill = async function(topic, skill) {
   });
 }
 
-// Returns all skills sorted by group, formatted as [{ options: [{},...] },...]
+// FUNCTION: Formats topic groups in "topics" collection as an options JSON object
 const listGroups = async function() {
   // Create new MongoDB client
   let client = newClient();
@@ -148,8 +157,7 @@ const listGroups = async function() {
   client.close();
 }
 
-
-// Returns all skills sorted by group, formatted as [{ options: [{},...] },...]
+// FUNCTION: Formats topics in "topics" colelction as an option_groups JSON object
 const listTopics = async function() {
   // Create new MongoDB client
   let client = newClient();
@@ -191,6 +199,7 @@ const listTopics = async function() {
   return option_groups;
 }
 
+// FUNCTION: Returns an array of all users in "users" collection
 const listUsers = async function() {
   // Create new MongoDB client
   let client = newClient();
@@ -206,6 +215,7 @@ const listUsers = async function() {
   });
   return user_list;
 }
+
 
 const addTopicToUser = async function() {
   // Create new MongoDB client
@@ -230,26 +240,41 @@ const addTopicToUser = async function() {
   });
 }
 
+// FUNCTION: Returns an option_groups JSON of users grouped by topics
+// ARGUMENTS: topics (String[])
 const findUsersByTopics = async function(topics) {
   // Create new MongoDB client
   let client = newClient();
   // Connect client to MongoDB cluster
   await client.connect();
-  // Get "topics-users" collection from "app-data" database
-  let collection = await client.db("app-data").collection("topics-users");
+  let results = await client.db("app-data").collection("topics-users").aggregate([
+    {
+      $match:
+      {
+        topic: {$in: topics}
+      }
+    },
+    {
+      $lookup:
+      {
+        from: "users",
+        localField: "user",
+        foreignField: "slack_id",
+        as: "userdetails"
+      }
+    }
+  ]).toArray();
   let topic_groups = [];
   for (topic of topics) {
-    let users = [];
-    await collection.find({"topic":topic}).forEach( function(doc) {
-      users.push(
-        {
-          text: {
-            type: "plain_text",
-            text: `${doc.user}`
-          },
-          value: `${doc.user}`
-        }
-      );
+    users = results.filter(result => result.topic == topic);
+    users = users.map(user => {
+      return {
+        text: {
+          type: "plain_text",
+          text: `${user.userdetails[0].name} (${user.userdetails[0].year})`
+        },
+        "value": `${user.user}`
+      }
     });
     if (users.length != 0) {
       topic_groups.push(
@@ -258,10 +283,37 @@ const findUsersByTopics = async function(topics) {
             type: "plain_text",
             text: topic
           },
-          "options": users
+          options: users
       });
     }
   }
+  // // Get "topics-users" collection from "app-data" database
+  // let collection = await client.db("app-data").collection("topics-users");
+  // let topic_groups = [];
+  // for (topic of topics) {
+  //   let users = [];
+  //   await collection.find({"topic":topic}).forEach( function(doc) {
+  //     users.push(
+  //       {
+  //         text: {
+  //           type: "plain_text",
+  //           text: `${doc.user}`
+  //         },
+  //         value: `${doc.user}`
+  //       }
+  //     );
+  //   });
+  //   if (users.length != 0) {
+  //     topic_groups.push(
+  //       {
+  //         label: {
+  //           type: "plain_text",
+  //           text: topic
+  //         },
+  //         "options": users
+  //     });
+  //   }
+  // }
   return topic_groups;
 }
 
@@ -354,7 +406,7 @@ const getAllProfile = async function(){
   return res;
 }
 
-
+// MODULE EXPORTS
 module.exports = {
   addUser: addUser,
   addUserSkill: addUserSkill,

@@ -1,25 +1,21 @@
 // views.js
-// This is a module for creating modal views
+// This is a module for creating the app's views
 
+// Import the data.js module
 const data = require('./data');
 
-const emptyOptionGroup = {
-  label: {
-    type: 'plain_text',
-    text: 'None'
-  }
-}
+/* GREETINGS */
 
-/* GREETING FOR NEW USER */
-
-const newUserGreeting = function (user) {
+// FUNCTION: Returns a view JSON object for a message to a user not in the "users" collection
+// ARGUMENT: userID (String)
+const newUserGreeting = function (userID) {
   return {
     blocks: [
       {
         "type": "section",
         "text": {
           "type": "mrkdwn",
-          "text": `Hey there <@${user}>!\nWould you like to join?`
+          "text": `Hey there <@${userID}>!\nWould you like to join?`
         },
       },
       {
@@ -45,20 +41,20 @@ const newUserGreeting = function (user) {
         ]
       }
     ],
-    text: `Hey there <@${user}>!`
+    text: `Hey there <@${userID}>!`
   }
 };
 
-/* GREETING FOR EXISTING USER */
-
-const existingUserGreeting = function (user) {
+// FUNCTION: Returns a view JSON object for a message to a user in the "users" collection
+// ARGUMENT: userID (String)
+const existingUserGreeting = function (userID) {
   return {
     blocks: [
       {
         "type": "section",
         "text": {
           "type": "mrkdwn",
-          "text": `Hey there <@${user}>!\nHow can I help you?`
+          "text": `Hey there <@${userID}>!\nHow can I help you?`
         },
       },
       {
@@ -88,9 +84,10 @@ const existingUserGreeting = function (user) {
   }
 };
 
-
 /* NEW USER FORM */
 
+// FUNCTION: Returns a view JSON object for the Create Profile view
+// ARGUMENTS: channel (String), timestamp (String)
 const newUserInformation = async function (channel, timestamp) {
   topicList = await data.listTopics();
   return {
@@ -282,7 +279,9 @@ const updateSkillList = async function(selectedList) {
 
 /* QUESTION FORM */
 
+// FUNCTION: Returns a view JSON object for the base Question Form
 const questionForm = async function () {
+  // Get all topics from database as a JSON object
   topicList = await data.listTopics();
   return{
         type: "modal",
@@ -382,8 +381,7 @@ const questionForm = async function () {
   }
 }
 
-/* ADDITIONAL BLOCKS FOR SELECTING USERS */
-
+// OBJECT: 3rd block for the Question Form when no topics are selected
 const noTopicsSelected = {
   type: "section",
   block_id: "select_users_question",
@@ -393,6 +391,9 @@ const noTopicsSelected = {
   },
 }
 
+// FUNCTION: Returns the 3rd block for the Question Form
+//           when topics are selected but no users found
+// ARGUMENT: empty_groups (String[])
 const noUsersFound = function(empty_groups){
   let list = "";
   for (group of empty_groups) {
@@ -408,6 +409,9 @@ const noUsersFound = function(empty_groups){
   }
 }
 
+// FUNCTION: Returns the 3rd block for the Question Form
+//           when topics are selected and users are found
+// ARGUMENT: userList (option_groups JSON object)
 const usersFound = function(userList) {
   return {
     type: "section",
