@@ -103,7 +103,7 @@ const addNewSkill = async function(topic, skill) {
       process.exit(0);
     }
     let saved = doc.ops[0];
-    console.log(`${saved._id}: ${saved.group} (${saved.name})`);
+    console.log(`${saved.group}: ${saved.name}`);
     // Disconnect client from MongoDB cluster
     client.close();
   });
@@ -163,6 +163,7 @@ const findSkillInList = async function(new_skill) {
   //console.log(dup_switch);
   return dup_switch;
 }
+
 // FUNCTION: Formats topics in "topics" colelction as an option_groups JSON object
 const listTopics = async function() {
   // Create new MongoDB client
@@ -198,11 +199,12 @@ const listTopics = async function() {
           text: group
         },
         options: options
-      });
-    }
-
-
+      }
+    );
+  }
   return option_groups;
+  // Disconnect client from MongoDB cluster
+  client.close();
 }
 
 // FUNCTION: Returns an array of all users in "users" collection
