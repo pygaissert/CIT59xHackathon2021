@@ -368,14 +368,16 @@ app.view('modal-editProfile', async({ ack, view, body, say, client }) => {
       await data.addUser(values.student_name.student_name.value, body.user.id, year);
       // store user's original skills
       let old_skills = await data.userSkill(body.user.id);
-      // Determine what skills to keep
-      let toKeep = await parse.toKeepSkillList(old_skills, new_skills);
-      // Determine what skills to delete
-      let toDelete = await parse.toDeleteSkillList(toKeep, old_skills);
-      console.log(`Delete: ${toDelete}`);
-      // Determine what skills to add
-      let toAdd = await parse.toAddSkillList(toKeep, new_skills);
-      console.log(`Add: ${toAdd}`);
+
+      // // Determine what skills to keep
+      // let toKeep = await parse.toKeepSkillList(old_skills, new_skills);
+      // // Determine what skills to delete
+      // let toDelete = await parse.toDeleteSkillList(toKeep, old_skills);
+      // console.log(`Delete: ${toDelete}`);
+      // // Determine what skills to add
+      // let toAdd = await parse.toAddSkillList(toKeep, new_skills);
+      // console.log(`Add: ${toAdd}`);
+
       // await client.chat.update({
       //   channel: view.private_metadata.split('_')[0],
       //   ts: view.private_metadata.split('_')[1],
