@@ -322,9 +322,19 @@ const userUpdateInfo = async function(userId, newName, newYear){
   await client.connect();
   // Find user's info from "users" collection
   collection = await client.db("app-data").collection("users");
-  await collection.updateOne(
-    {slack_id: {$lt: userId}}, { $set: {name: newName}}, { $set: {year: newYear}}
-  );
+  try{
+    let updateResultOne = await collection.updateOne(
+      {"slack_id": userId}, { $set: {"name": newName}}
+    );
+    await collection.updateOne(
+      {"slack_id": userId}, { $set: {"year": newYear}}
+    );
+
+    console.log(updateResultOne);
+  } catch(error){
+    console.log(error);
+  }
+
   // Disconnect client from MongoDB cluster
   client.close();
 }

@@ -83,7 +83,7 @@ const existingUserGreeting = function (userID) {
         ]
       }
     ],
-    text: `Hey there <@${user}>!`
+    text: `Hey there <@${userID}>!`
   }
 };
 
@@ -982,5 +982,5 @@ module.exports = {
   usersFound: usersFound,
   noUsersFound: noUsersFound,
   noTopicsSelected: noTopicsSelected,
-  // editUserInformation: editUserInformation
+  editUserInformation: editUserInformation
 }

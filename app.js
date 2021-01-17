@@ -274,7 +274,7 @@ app.view('modal_addskill', async({ ack, view, response, body, say, client }) => 
       // Add to MongoDB database
       await data.addNewSkill(values.add_Topic.add_Topic.selected_option.value, formattedSkill);
       // Determine whether to show updated new user form or edit profile form
-      if (await data.userExists(message.user)) {
+      if (await data.userExists(body.user.id)) {
         // set view back to editProfile view
         clearEditProfile = await views.editUserInformation(channel, timestamp, body.user.id);
         // clear block 3 of inputs
@@ -644,8 +644,8 @@ app.command('/my-profile', async ({ command, ack, say, body, client}) => {
     // await views.showUserProfile(command.user_id)
     // write new message, show user's own profile
     const result = await say(
-      await views.showUserProfile("U01JMNX5NSF")
-      // await views.showUserProfile(body.user_id)
+      // await views.showUserProfile("U01JMNX5NSF")
+      await views.showUserProfile(body.user_id)
 
     );
   } catch (error){
@@ -692,7 +692,7 @@ app.action('button_message_by_profile',async({action, ack, body, client}) =>{
       			type: "section",
       			text: {
       				type: "mrkdwn",
-      				text: `*:speech_balloon:  Are you sure you want to send a message to ${dm_id}?*`
+      				text: `*:speech_balloon:  Are you sure you want to send a message to <@${dm_id}>?*`
       			}
       		},
       		{
@@ -816,37 +816,37 @@ app.view('dm_rusure', async({ ack, body, view, client }) => {
   }
 });
 
-// TODO: IMPLEMENTING edit profile
-app.action('button_edit',async({action, ack, body, client}) =>{
-  // Acknowledge the view_submission
-  await ack();
-  console.log("Acknowledged - EDIT!");
-
-  try {
-    let result = await editProfile({action, ack, body, client });
-
-  } catch (error){
-    console.error(error);
-  }
-});
-
-async function editProfile({action, ack, body, client }) {
-
-  // await views.editUserInformation("U01JMNX5NSF", body.channel.id, body.container.message_ts);
-
-  // Open the modal for editing an EliCIT profile
-  const result = await client.views.open({
-    // Pass a valid trigger_id within 3 seconds of receiving it
-    trigger_id: body.trigger_id,
-    // Pass a valid view_id
-    // View payload
-
-    // TODO change user_id
-    // view: await views.editUserInformation(body.user_id, body.channel.id, body.container.message_ts)
-    view: await views.editUserInformation("U01JMNX5NSF", body.channel.id, body.container.message_ts)
-  });
-
-}
+// // TODO: IMPLEMENTING edit profile
+// app.action('button_edit',async({action, ack, body, client}) =>{
+//   // Acknowledge the view_submission
+//   await ack();
+//   console.log("Acknowledged - EDIT!");
+//
+//   try {
+//     let result = await editProfile({action, ack, body, client });
+//
+//   } catch (error){
+//     console.error(error);
+//   }
+// });
+//
+// async function editProfile({action, ack, body, client }) {
+//
+//   // await views.editUserInformation("U01JMNX5NSF", body.channel.id, body.container.message_ts);
+//
+//   // Open the modal for editing an EliCIT profile
+//   const result = await client.views.open({
+//     // Pass a valid trigger_id within 3 seconds of receiving it
+//     trigger_id: body.trigger_id,
+//     // Pass a valid view_id
+//     // View payload
+//
+//     // TODO change user_id
+//     // view: await views.editUserInformation(body.user_id, body.channel.id, body.container.message_ts)
+//     view: await views.editUserInformation("U01JMNX5NSF", body.channel.id, body.container.message_ts)
+//   });
+//
+// }
 
 
 // STARTS THE APP
