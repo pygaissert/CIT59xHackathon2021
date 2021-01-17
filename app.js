@@ -586,14 +586,14 @@ app.view('submit_question', async({ ack, body, view, client }) => {
 
 // adding some basic function below:
 // app homepage
-app.event('app_home_opened', async({ event, client }) =>{
-
-  console.log("home opened!!!!!");
+app.event('app_home_opened', async({ payload, client }) =>{
+  console.log(`Home tab opened by user ${payload.user}`);
   try{
     // publish home page when user click home
     const result = await client.views.publish({
-        user_id: event.user,
-        view: await views.homepage(event)
+        token: slackBotToken,
+        user_id: payload.user,
+        view: await views.homepage(payload)
     });
     console.log(result);
   } catch (error){
