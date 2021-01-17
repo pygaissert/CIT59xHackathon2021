@@ -104,7 +104,7 @@ const toDeleteSkillList = function(keep_skills, old_skills){
   for (i = 0; i < old_skills.length; i++){
     for (j = i; j < keep_skills.length; j++){
       if(i === j){
-        deleteList.splice(1, old_skills[i]);
+        deleteList.splice(old_skills[i], 1);
       }
     }
   }
@@ -118,7 +118,7 @@ const toAddSkillList = function(keep_skills, new_skills){
   for (i = 0; i < new_skills.length; i++){
     for (j = i; j < keep_skills.length; j++){
       if(i === j){
-        addList.splice(1, new_skills[i]);
+        addList.splice(new_skills[i], 1);
       }
     }
   }

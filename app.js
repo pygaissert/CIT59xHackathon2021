@@ -365,54 +365,61 @@ app.view('modal-editProfile', async({ ack, view, body, say, client }) => {
     //UPDATING USER INFO
     try {
       // Update user name, id, and graduation year to "users" collection
-      await data.addUser(values.student_name.student_name.value, body.user.id, year);
+      await data.userUpdateInfo(values.student_name.student_name.value, body.user.id, year);
       // store user's original skills
       let old_skills = await data.userSkill(body.user.id);
 
-      // // Determine what skills to keep
-      // let toKeep = await parse.toKeepSkillList(old_skills, new_skills);
-      // // Determine what skills to delete
-      // let toDelete = await parse.toDeleteSkillList(toKeep, old_skills);
-      // console.log(`Delete: ${toDelete}`);
-      // // Determine what skills to add
-      // let toAdd = await parse.toAddSkillList(toKeep, new_skills);
-      // console.log(`Add: ${toAdd}`);
-
-      // await client.chat.update({
-      //   channel: view.private_metadata.split('_')[0],
-      //   ts: view.private_metadata.split('_')[1],
-      //   blocks: [
-      //     {
-      //       type: "section",
-      //       text: {
-      //         type: "mrkdwn",
-      //         text: `Thank you for updating your profile ${values.student_name.student_name.value}!`
-      //       },
-      //     },
-      //     {
-      //       type: "actions",
-      //       elements: [
-      //         {
-      //           type: "button",
-      //           text: {
-      //             type: "plain_text",
-      //             text: "Edit Profile"
-      //           },
-      //           style: "primary",
-      //           action_id: "button_edit"
-      //         },
-      //         {
-      //           type: "button",
-      //           text: {
-      //             type: "plain_text",
-      //             text: "Ask a Question"
-      //           },
-      //           action_id: "button_question"
-      //         }
-      //       ]
-      //     }
-      //   ]
-      // });
+      // Determine what skills to keep
+      let toKeep = await parse.toKeepSkillList(old_skills, new_skills);
+      // Determine what skills to delete
+      let toDelete = await parse.toDeleteSkillList(toKeep, old_skills);
+      console.log(`Delete: ${toDelete}`);
+      // Remove skill in toDelete array from "topics-users" database
+      for (skill of toDelete){
+        /* PHILIPP'S CODE */
+      }
+      // Determine what skills to add
+      let toAdd = await parse.toAddSkillList(toKeep, new_skills);
+      console.log(`Add: ${toAdd}`);
+      // Add skill in toAdd array to "topics-users" database
+      for (skill of toAdd){
+        await data.addTopicToUser(body.user.id, skill);
+      }
+      await client.chat.update({
+        channel: view.private_metadata.split('_')[0],
+        ts: view.private_metadata.split('_')[1],
+        blocks: [
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: `Thank you for updating your profile ${values.student_name.student_name.value}!`
+            },
+          },
+          {
+            type: "actions",
+            elements: [
+              {
+                type: "button",
+                text: {
+                  type: "plain_text",
+                  text: "Edit Profile"
+                },
+                style: "primary",
+                action_id: "button_edit"
+              },
+              {
+                type: "button",
+                text: {
+                  type: "plain_text",
+                  text: "Ask a Question"
+                },
+                action_id: "button_question"
+              }
+            ]
+          }
+        ]
+      });
     } catch (error) {
       console.log(error);
     }

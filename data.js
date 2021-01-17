@@ -315,7 +315,7 @@ const userSkill = async function(userId){
 
 // FUNCTION:
 // ARGUMENT:
-const userUpdateName = async function(userId, newName, newYear){
+const userUpdateInfo = async function(userId, newName, newYear){
   // Create new MongoDB client
   let client = newClient();
   // Connect client to MongoDB cluster
@@ -325,8 +325,6 @@ const userUpdateName = async function(userId, newName, newYear){
   await collection.updateOne(
     {slack_id: {$lt: userId}}, { $set: {name: newName}}, { $set: {year: newYear}}
   );
-  let saved = doc.ops[0];
-  console.log(`${saved.slack_id}: ${saved.name} (${saved.year})`);
   // Disconnect client from MongoDB cluster
   client.close();
 }
@@ -530,5 +528,5 @@ module.exports = {
   formatSkillToOptionsGroup: formatSkillToOptionsGroup,
   userInfo: userInfo,
   userSkill: userSkill,
-  userUpdateName: userUpdateName
+  userUpdateInfo: userUpdateInfo
 }
