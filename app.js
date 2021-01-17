@@ -184,7 +184,68 @@ app.action('add_Skill', async({ ack, body, say, client}) => {
 app.view('modal-newuser', async({ ack, view, body, say, client }) => {
   let values = view.state.values;
   let year = values.select_year.graduation_year.value;
-
+  if (year > 1900 && year < 2040){
+    // acknowlege modal submission
+    await ack();
+    // parse through selected skills
+    let skills = parse.getValuesFromOptions(values.select_topics_newuser.select_topics_newuser.selected_options);
+    console.log(skills);
+    try {
+      // add user name, id, and graduation year to users collection
+      await data.addUser(body.user.name, body.user.id, year);
+      //add user and skills to topics-user collection
+      for (skill of skills){
+        await data.addTopicToUser(body.user.id, skill);
+      }
+      await client.chat.update({
+        channel: view.private_metadata.split('_')[0],
+        ts: view.private_metadata.split('_')[1],
+        blocks: [
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: `All done! Thank you for joining, <@${body.user.id}>!`
+            },
+          },
+          {
+            type: "actions",
+            elements: [
+              {
+                type: "button",
+                text: {
+                  type: "plain_text",
+                  text: "Edit Profile"
+                },
+                style: "primary",
+                action_id: "button_edit"
+              },
+              {
+                type: "button",
+                text: {
+                  type: "plain_text",
+                  text: "Ask a Question"
+                },
+                action_id: "button_question"
+              }
+            ]
+          }
+        ]
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  else {
+    // return error of modal submission
+    await ack(
+      {
+        response_action: "errors",
+        errors: {
+          select_year: "Invalid year! Enter a valid year!"
+        }
+      }
+    )
   }
 });
 
