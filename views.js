@@ -734,7 +734,7 @@ const showUserProfile = async function(user_id) {
                     "type": "section",
                     "text": {
                       "type": "mrkdwn",
-                      "text": "*Learned new skills? Click to update yoru profile:*",
+                      "text": "*Learned new skills? Click to update your profile:*",
                     }
                   },
             {
