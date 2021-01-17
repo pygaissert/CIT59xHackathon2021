@@ -274,7 +274,7 @@ app.view('modal_addskill', async({ ack, view, response, body, say, client }) => 
       // Add to MongoDB database
       await data.addNewSkill(values.add_Topic.add_Topic.selected_option.value, formattedSkill);
       // Determine whether to show updated new user form or edit profile form
-      if (await data.userExists(body.user.id)) {
+      if (await data.userExists(message.user)) {
         // set view back to editProfile view
         clearEditProfile = await views.editUserInformation(channel, timestamp, body.user.id);
         // clear block 3 of inputs
@@ -349,6 +349,20 @@ app.action('button_edit', async({ ack, view, response, body, say, client }) => {
   }
 });
 
+// ACTION: User clicks the button to view profile
+// RESPONSE: Open attachment view to allow user to see profile
+app.action('button_viewProfile', async({ command, ack, say, body, client}) => {
+  await ack();
+  try {
+    // write new message, show user's own profile
+    const result = await say(
+      await views.showUserProfile(body.user.id)
+    );
+  } catch (error){
+    console.error(error);
+  }
+});
+
 // ACTION: User clicks the modal submit button
 // RESPONSE: Extraction of name, graduation year and skills
 app.view('modal-editProfile', async({ ack, view, body, say, client }) => {
@@ -393,7 +407,7 @@ app.view('modal-editProfile', async({ ack, view, body, say, client }) => {
             type: "section",
             text: {
               type: "mrkdwn",
-              text: `Thank you for updating your profile ${values.student_name.student_name.value}!`
+              text: `*Thank you for updating your profile* ${values.student_name.student_name.value}!`
             },
           },
           {
@@ -403,17 +417,9 @@ app.view('modal-editProfile', async({ ack, view, body, say, client }) => {
                 type: "button",
                 text: {
                   type: "plain_text",
-                  text: "Edit Profile"
+                  text: "Ask A Question"
                 },
                 style: "primary",
-                action_id: "button_edit"
-              },
-              {
-                type: "button",
-                text: {
-                  type: "plain_text",
-                  text: "Ask a Question"
-                },
                 action_id: "button_question"
               }
             ]
@@ -692,7 +698,7 @@ app.action('button_message_by_profile',async({action, ack, body, client}) =>{
       			type: "section",
       			text: {
       				type: "mrkdwn",
-      				text: `*:speech_balloon:  Are you sure you want to send a message to <@${dm_id}>?*`
+      				text: `*:speech_balloon:  Are you sure you want to send a message to ${dm_id}?*`
       			}
       		},
       		{
