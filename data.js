@@ -359,6 +359,10 @@ const getAllProfile = async function(){
 module.exports = {
   addUser: addUser,
   addUserSkill: addUserSkill,
+
+
+
+
   userExists: userExists,
   listTopics:listTopics,
   listUsers:listUsers,

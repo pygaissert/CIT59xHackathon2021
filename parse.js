@@ -13,6 +13,7 @@ const isOptionGroupEmpty = function(option_groups) {
   console.log(empty_groups);
 }
 
+
 // Returns an array of values parsed from an array of JSON option objects
 const getValuesFromOptions = function(options) {
   let values = [];
