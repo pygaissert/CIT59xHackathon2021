@@ -322,13 +322,14 @@ const questionForm = async function () {
       			}
       		},
       		{
-      			type: "section",
+      			type: "input",
       			block_id: "select_topics_question",
-      			text: {
-      				type: "mrkdwn",
+            dispatch_action: true,
+      			label: {
+      				type: "plain_text",
       				text: "Select related topic(s)"
       			},
-      			accessory: {
+      			element: {
       				action_id: "select_topics_question",
       				type: "multi_static_select",
       				placeholder: {
@@ -339,41 +340,6 @@ const questionForm = async function () {
       			},
       		},
           noTopicsSelected,
-          // {
-          //   type: "section",
-          //   block_id: "section789",
-          //   text: {
-          //     type: "mrkdwn",
-          //     text: "Select classmates (optional)"
-          //   },
-          //   accessory: {
-          //     action_id: "select_user",
-          //     type: "multi_external_select",
-          //     placeholder: {
-          //       type: "plain_text",
-          //       text: "Select here"
-          //     },
-          //     min_query_length: 0
-          //   }
-          // }
-      		// {
-      		// 	type: "input",
-      		// 	element: {
-      		// 		type: "multi_users_select",
-      		// 		placeholder: {
-      		// 			type: "plain_text",
-      		// 			text: "Select people to ask this question to:",
-      		// 			emoji: true
-      		// 		},
-      		// 		action_id: "multi_users_select-action"
-      		// 	},
-      		// 	label: {
-      		// 		type: "plain_text",
-      		// 		text: "Select classmates (optional)",
-      		// 		emoji: true
-      		// 	}
-      		// },
-
       	],
         submit: {
           type: 'plain_text',

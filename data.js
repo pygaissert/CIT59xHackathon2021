@@ -222,7 +222,24 @@ const listUsers = async function() {
   return user_list;
 }
 
-
+// FUNCTION: Removes a topic-user pairing from the "topics-users" collection
+// ARGUMENTS: topicName (String), userID ()
+const removeTopicFromUser = async function(topicName, userID) {
+  try {
+    let client = newClient();
+    await client.connect();
+    let connection = client.db("app-data").collection("topics-users");
+    // Removes a document from "topics-users" with the matching topic and user
+    let deleteResult = await connection.deleteOne({ "topic": topic, "user:": user });
+    if (deleteResult.deletedCount === 1) {
+      console.log("Successfully deleted one document.");
+    } else {
+      console.log("No documents matched the query. Nothing was deleted.")
+    }
+  } finally {
+    await client.close();
+  }
+}
 
 // FUNCTION: Returns an option_groups JSON of users grouped by topics
 // ARGUMENTS: topics (String[])
@@ -231,6 +248,7 @@ const findUsersByTopics = async function(topics) {
   let client = newClient();
   // Connect client to MongoDB cluster
   await client.connect();
+
   let results = await client.db("app-data").collection("topics-users").aggregate([
     {
       $match:

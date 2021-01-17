@@ -34,6 +34,9 @@ const parseQuestionSubmission = function(view, user) {
   topics = getValuesFromOptions(view.state.values.select_topics_question.select_topics_question.selected_options).join(', ');
   // Parse the array of selected users from the view_submission
   users = getValuesFromOptions(view.state.values.select_users_question.select_users_question.selected_options);
+  if (users.length == 0) {
+    users = getValuesFromOptionGroups(view.blocks[2].accessory.option_groups);
+  }
   // Add the asking user's Slack ID to the array if it is not already included
   if (!users.includes(user)) {
     users.push(user);
@@ -48,6 +51,19 @@ const parseQuestionSubmission = function(view, user) {
     users: users,
     question: question
   }
+}
+
+// FUNCTION: Returns an array of distinct values
+//           parsed from an option_groups JSON
+// ARGUMENT: option_groups
+const getValuesFromOptionGroups = function(option_groups) {
+  let values = [];
+  // For each option group, add the values to the array
+  for (group of option_groups) {
+    values = values.concat(getValuesFromOptions(group.options));
+  }
+  // Return the array without duplicate values
+  return [...new Set(values)];
 }
 
 // FUNCTION: Formats selected skills into options JSON object

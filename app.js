@@ -332,11 +332,12 @@ app.action('select_topics_question', async({ ack, body, action, client }) => {
   console.log("Acknowledged - Topic Selected");
   // Create a new identical Question Form view
   let updatedQuestionForm = await views.questionForm();
-  // Check any topics were selected
+  // Check if any topics are still selected
   if (action.selected_options.length == 0) {
     // If there are no topics selected, give the updated view an empty 3rd block
     updatedQuestionForm.blocks[2] = views.noTopicsSelected;
-  } else {
+  }
+  else {
     // If there are still topics selected...
     // Parse an array of selected topics from action.selected_options
     let updatedTopicsList = parse.getValuesFromOptions(action.selected_options);
@@ -346,55 +347,59 @@ app.action('select_topics_question', async({ ack, body, action, client }) => {
     if (relatedUserList.length == 0) {
       // If no users were found, give the updated view a 3rd block with a message
       updatedQuestionForm.blocks[2] = await views.noUsersFound(updatedTopicsList);
-    } else {
+    }
+    else {
       // If users were found...
       // Give the updated view a 3rd block with a multi-select menu for selecting users
       updatedQuestionForm.blocks[2] = await views.usersFound(relatedUserList);
       // Check if there were users already selected before
       if (body.view.state.values.select_users_question) {
-          // If users were already selected...
-          // Get the list of previously selected users as a JSON object
-          previouslySelectedUsers = body.view.state.values.select_users_question.select_users_question.selected_options;
-          // This array will hold the initial_options for the multi-select menu
-          updatedSelectedUsers = [];
-          // For each of the previously selected users...
-          previouslySelectedUsers.forEach( (user) => {
-            // Check if they are still in the selectable users, given the selected topic(s)
-            updatedQuestionForm.blocks[2].accessory.option_groups.forEach( (group) => {
-              // Ensure that there are no duplicates in the initial_options
-              if (updatedSelectedUsers.includes(user)) {
-                return;
-              }
-              // If a previously selected user is related to any of the currently selected topics...
-              if (parse.getValuesFromOptions(group.options).includes(user.value)) {
-                // Add them to the array
-                updatedSelectedUsers.push(user);
-              }
-            });
+        // If users were already selected...
+        // Get the list of previously selected users as a JSON object
+        previouslySelectedUsers = body.view.state.values.select_users_question.select_users_question.selected_options;
+        // This array will hold the initial_options for the multi-select menu
+        updatedSelectedUsers = [];
+        // For each of the previously selected users...
+        previouslySelectedUsers.forEach( (user) => {
+          // Check if they are still in the selectable users, given the selected topic(s)
+          updatedQuestionForm.blocks[2].accessory.option_groups.forEach( (group) => {
+            // Ensure that there are no duplicates in the initial_options
+            if (updatedSelectedUsers.includes(user)) {
+              return;
+            }
+            // If a previously selected user is related to any of the currently selected topics...
+            if (parse.getValuesFromOptions(group.options).includes(user.value)) {
+              // Add them to the array
+              updatedSelectedUsers.push(user);
+            }
           });
-          // If the array is not empty
-          if (updatedSelectedUsers.length != 0) {
-            updatedQuestionForm.blocks[2].accessory.initial_options = updatedSelectedUsers;
-          }
+        });
+        // If the updated array of selected users is not empty...
+        if (updatedSelectedUsers.length != 0) {
+          // Set the array as the initial_options of the multi-select menu
+          updatedQuestionForm.blocks[2].accessory.initial_options = updatedSelectedUsers;
         }
       }
     }
-
-  // Update the Question Form modal (INCOMPLETE)
+  }
+  // At this point, we have the appropriately updated Question Form
+  // Create a temporary base Question Form
   tempForm = await views.questionForm();
+  // Give the temporary Question Form an empty 3rd block
   tempForm.blocks[2] = views.noTopicsSelected;
   try {
+    // Briefly update the Question Form to have an empty 3rd block
     await client.views.update({
       token: slackBotToken,
       view: tempForm,
       view_id: body.view.id,
       hash: body.view.hash,
     });
+    // Then update the Question Form with the desired settings
     await client.views.update({
       token: slackBotToken,
       view: updatedQuestionForm,
       view_id: body.view.id,
-      //hash: body.view.hash,
     });
   } catch (error) {
     console.log(error);
@@ -402,13 +407,11 @@ app.action('select_topics_question', async({ ack, body, action, client }) => {
 });
 
 // ACTION: User selects related users to direct their question at
-// RESPONSE: Acknowledge action
-app.action('select_users_question', async({ack}) => {
+// RESPONSE: Acknowledge action (No real action is needed)
+app.action('select_users_question', async({ ack }) => {
   await ack();
-  console.log("Acknowledged - User Selected")
+  console.log("Acknowledged - User Selected");
 })
-
-// TODO - if no users were selected, send to ALL users related to the topic(s)
 
 // ACTION: User submits the Question Form
 // RESPONSE: Creates a group direct message and sends question
@@ -418,7 +421,6 @@ app.view('submit_question', async({ ack, body, view, client }) => {
   console.log("Acknowledged - Question Submitted");
   // Parse the view_submission for the question, the topics, and the users
   submission = parse.parseQuestionSubmission(view, body.user.id);
-  console.log(submission.users);
   try {
     let result = await client.conversations.open({
       token: slackBotToken,
