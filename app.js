@@ -704,9 +704,6 @@ app.view('dm_rusure', async({ ack, body, view, client }) => {
 
 
 
-
-
-
 // IMPLEMENTING edit profile
 
 

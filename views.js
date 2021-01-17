@@ -730,23 +730,7 @@ const showUserProfile = async function(user_id) {
             // "thumb_url": "https://static.wikia.nocookie.net/spongebob/images/9/96/The_Two_Faces_of_Squidward_174.png/revision/latest/scale-to-width-down/1000?cb=20200923005328",
             // "footer": "footer",
             // "ts": 123456789
-            // ,
-            "blocks": [
-              {
-                "type": "actions",
-                "elements": [
-                  {
-                    "type": "button",
-                    "text": {
-                      "type": "plain_text",
-                      "text": "Edit Your Profile"
-                    },
-                    "style": "primary",
-                    "action_id": "button_edit"
-                  }
-                ]
-              }
-            ]
+
         },
         {
           "color": "#f2c744",
@@ -883,6 +867,7 @@ const showAllProfiles = async function() {
     	"blocks": blocks
   }
 }
+
 
 
 

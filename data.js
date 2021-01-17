@@ -322,6 +322,7 @@ const getProfileById = async function(user_id){
   // get user document
   let user = await collectionUsers.findOne({slack_id:user_id});
 
+  console.log(user_id)
   // get user graduating year:
   res.push(user.year);
 
@@ -371,7 +372,7 @@ const getAllProfile = async function(){
     // // push user_id
     // temp.push(u);
 
-    temp.push(user.name);
+    temp.push(u);
     // push year
     temp.push(user.year);
 
