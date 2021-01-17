@@ -282,7 +282,7 @@ app.view('modal_addskill', async({ ack, view, response, body, say, client }) => 
       // Add to MongoDB database
       await data.addNewSkill(values.add_Topic.add_Topic.selected_option.value, formattedSkill);
       // Determine whether to show updated new user form or edit profile form
-      if (await data.userExists(message.user)) {
+      if (await data.userExists(body.user.id)) {
         // set view back to editProfile view
         clearEditProfile = await views.editUserInformation(channel, timestamp, body.user.id);
         // clear block 3 of inputs
