@@ -70,7 +70,8 @@ const formatSkillList = async function(list) {
   return selectedSkills;
 }
 
-// Capitalizes the first letter of each word of a string
+// FUNCTION: Capitalizes the first letter of each word of a string
+// ARGUMENTS: skill_input (string)
 const capitalize = function(skill_input){
   let skill_array = skill_input.split(" ");
   let formatted_skill = "";
@@ -82,12 +83,55 @@ const capitalize = function(skill_input){
   return formatted_skill;
 }
 
+// FUNCTION:
+// ARGUMENTS:
+const toKeepSkillList = function(old_skills, new_skills){
+  let keepList = [];
+  for (i of old_skills){
+    for (j of new_skills){
+      if (i === j){
+        keepList.push(i);
+      }
+    }
+  }
+  return keepList;
+}
 
+// FUNCTION:
+// ARGUMENTS:
+const toDeleteSkillList = function(keep_skills, old_skills){
+  let deleteList = old_skills;
+  for (i = 0; i < old_skills.length; i++){
+    for (j = i; j < keep_skills.length; j++){
+      if(i === j){
+        deleteList.splice(1, old_skills[i]);
+      }
+    }
+  }
+  return deleteList;
+}
+
+// FUNCTION:
+// ARGUMENTS:
+const toAddSkillList = function(keep_skills, new_skills){
+  let addList = new_skills;
+  for (i = 0; i < new_skills.length; i++){
+    for (j = i; j < keep_skills.length; j++){
+      if(i === j){
+        addList.splice(1, new_skills[i]);
+      }
+    }
+  }
+  return addList;
+}
 
 module.exports = {
   isOptionGroupEmpty: isOptionGroupEmpty,
   getValuesFromOptions: getValuesFromOptions,
   parseQuestionSubmission: parseQuestionSubmission,
   formatSkillList: formatSkillList,
-  capitalize: capitalize
+  capitalize: capitalize,
+  toKeepSkillList: toKeepSkillList,
+  toDeleteSkillList: toDeleteSkillList,
+  toAddSkillList: toAddSkillList
 }
