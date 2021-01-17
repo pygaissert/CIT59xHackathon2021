@@ -57,7 +57,7 @@ const existingUserGreeting = function (userID) {
         "type": "section",
         "text": {
           "type": "mrkdwn",
-          "text": `Hey there <@${userID}>!\nHow can I help you?`
+          "text": `Hey there <@${userID}>!\nWhat can I help you with?`
         },
       },
       {
@@ -67,10 +67,10 @@ const existingUserGreeting = function (userID) {
             "type": "button",
             "text": {
               "type": "plain_text",
-              "text": "Edit Profile"
+              "text": "View Profile"
             },
             "style": "primary",
-            "action_id": "button_edit"
+            "action_id": "button_viewProfile"
           },
           {
             "type": "button",
@@ -245,6 +245,9 @@ const updateSkillList = async function(selectedList, topicList) {
 }
 
 
+
+
+
 /* ADDING NEW SKILLS TO ELICIT */
 
 // FUNCTION:
@@ -314,10 +317,12 @@ const addSkill = async function (channel, timestamp, hash, skillList) {
 
 
 
+
+
 /* EDIT PROFILE */
 
-// FUNCTION:
-// ARGUMENTS:
+// FUNCTION: Modal format for edit profile modal
+// ARGUMENTS: channel (String), timestamp (string), slack_id(string)
 const editUserInformation = async function (channel, timestamp, slack_id) {
   // get user information from data.js
   let info = await data.userInfo(slack_id);
