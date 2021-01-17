@@ -30,7 +30,6 @@ const userExists = async function(userId) {
   client.close();
 }
 
-
 // FUNCTION: Adds a new user to the "users" collection
 // ARGUMENTS: userName (String), userId (String), userYear (String)
 const addUser = async function(userName, userId, userYear) {
@@ -57,8 +56,8 @@ const addUser = async function(userName, userId, userYear) {
   });
 }
 
-
-
+// FUNCTION:
+// ARGUMENTS:
 const addTopicToUser = async function(userId, topic) {
   // Create new MongoDB client
   let client = newClient();
@@ -83,9 +82,8 @@ const addTopicToUser = async function(userId, topic) {
 }
 
 
-
-
 // FUNCTION: Adds user-inputted skills to the "topics" collection
+// ARGUMENTS:
 const addNewSkill = async function(topic, skill) {
   //create new MongoDB client
   let client = new MongoClient(uri, { useUnifiedTopology: true });
@@ -103,7 +101,7 @@ const addNewSkill = async function(topic, skill) {
       process.exit(0);
     }
     let saved = doc.ops[0];
-    console.log(`${saved._id}: ${saved.group} (${saved.name})`);
+    console.log(`${saved.group}: ${saved.name}`);
     // Disconnect client from MongoDB cluster
     client.close();
   });
@@ -163,6 +161,7 @@ const findSkillInList = async function(new_skill) {
   //console.log(dup_switch);
   return dup_switch;
 }
+
 // FUNCTION: Formats topics in "topics" colelction as an option_groups JSON object
 const listTopics = async function() {
   // Create new MongoDB client
@@ -198,11 +197,136 @@ const listTopics = async function() {
           text: group
         },
         options: options
-      });
-    }
-
-
+      }
+    );
+  }
   return option_groups;
+  // Disconnect client from MongoDB cluster
+  client.close();
+}
+
+// FUNCTION: Formats selected skill list into option_groups JSON object and append to listTopics
+// ARGUMENTS: string of skills
+const formatSkillToOptionsGroup = async function(skillList){
+  // Create new MongoDB client
+  let client = newClient();
+  // Connect client to MongoDB cluster
+  await client.connect();
+  // Get "topics" collection from "app-data" database
+  collection = await client.db("app-data").collection("topics");
+  // Empty array to store option_groups for select menu
+  let option_groups = [];
+  // Get array of distinct topic groups (strings) from "topics" collection
+  let topic_groups = await collection.distinct("group");
+  // Iterate over the topic groups
+  for (group of topic_groups) {
+    // Empty array to store options in current option_group
+    let options = [];
+    // Get topics in current topic group, and add formatted JSON to options[]
+    await collection.find({group:group}).sort({"name": 1}).forEach( function(topic) {
+      options.push(
+        {
+          text: {
+            type: 'plain_text',
+            text: topic.name
+          },
+          value: topic.name
+        });
+      });
+    // After topics have been added to options[], add formatted JSON to option_groups[]
+    option_groups.push(
+      {
+        label: {
+          type: "plain_text",
+          text: group
+        },
+        options: options
+      }
+    );
+  }
+  // Disconnect client from MongoDB cluster
+  client.close();
+  // Empty array to store skill in option_group
+  let options = [];
+  // Store each new skill in options
+  for (skill of skillList){
+    options.push(
+      {
+        text: {
+          type: 'plain_text',
+          text: skill
+        },
+        value: skill
+      }
+    );
+  }
+  // After topics have been added to options[], add formatted JSON to option_groups[]
+  option_groups.push(
+    {
+      label: {
+        type: "plain_text",
+        text: "User Selected Skill(s)"
+      },
+      options: options
+    }
+  );
+  return option_groups;
+}
+
+// FUNCTION: Finds user's graduation year and full name and puts that into an array
+// ARGUMENT: user's slack_id
+const userInfo = async function(userId){
+  // Create new MongoDB client
+  let client = newClient();
+  // Connect client to MongoDB cluster
+  await client.connect();
+  // Empty array to store user graduation and name
+  let info = [];
+  // Find user's info from "users" collection
+  let result = await client.db("app-data").collection("users").findOne({slack_id: userId});
+  info.push(result.name);
+  info.push(result.year);
+  // Disconnect client from MongoDB cluster
+  client.close();
+  return info;
+}
+
+// Function: puts user's current skills into an array (no JSON object formatting)
+// ARGUMENT: user's slack_id
+const userSkill = async function(userId){
+  // Create new MongoDB client
+  let client = newClient();
+  // Connect client to MongoDB cluster
+  await client.connect();
+  // Empty array to store option_groups for select menu
+  let skills = [];
+  // Get "topics-user" collection from "app-data" database
+  // Find skills with user's slack_id
+  const cursor = await client.db("app-data").collection("topics-users").find({user: userId});
+  const parsedResult = await cursor.toArray();
+  // Parse through results to obtain the topic string
+  for (result of parsedResult){
+    // Add topic string to skills array
+    skills.push(result.topic);
+  }
+  client.close();
+  return skills;
+}
+
+// FUNCTION:
+// ARGUMENT:
+const userUpdateInfo = async function(userId, newName, newYear){
+  // Create new MongoDB client
+  let client = newClient();
+  // Connect client to MongoDB cluster
+  await client.connect();
+  // Find user's info from "users" collection
+  collection = await client.db("app-data").collection("users");
+  await collection.updateOne(
+    {slack_id: {$lt: userId}}, { $set: {name: newName}}, { $set: {year: newYear}}
+  );
+  // Disconnect client from MongoDB cluster
+  client.close();
 }
 
 // FUNCTION: Returns an array of all users in "users" collection
@@ -319,7 +443,6 @@ const findUsersByTopics = async function(topics) {
   return topic_groups;
 }
 
-
 // function to to get user profile in array, by user id
 // TODO: change user_id formated string when database is implemented
 const getProfileById = async function(user_id){
@@ -421,5 +544,10 @@ module.exports = {
   getProfileById: getProfileById,
   getAllProfile: getAllProfile,
   listGroups: listGroups,
-  findSkillInList: findSkillInList
+  findSkillInList: findSkillInList,
+  formatSkillToOptionsGroup: formatSkillToOptionsGroup,
+  userInfo: userInfo,
+  userSkill: userSkill,
+  userUpdateInfo: userUpdateInfo,
+  removeTopicFromUser: removeTopicFromUser
 }

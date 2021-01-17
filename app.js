@@ -139,20 +139,12 @@ app.action('select_topics_newuser', async({ ack, body, say, client }) => {
   await ack();
 });
 
-// ACTION: multi_static_select-action
-// RESPONSE: Acknowledge multi-select skills updated
-app.action('select_topics_newuser2', async({ ack, body, say, client }) => {
-  // print out info
-  // console.log(body.actions.selected_options);
-  // Acknowledge selection of skill
-  await ack();
-});
-
 // ACTION:   button_addSkill
 // RESPONSE: Acknowledge skills selection and open add_skill modal
 app.action('button_addSkill', async({ ack, view, body, say, client }) => {
   // Acknowledge addSkill button
   await ack();
+  console.log(body.view.state);
   let selectedSkills = parse.getValuesFromOptions(body.view.state.values.select_topics_newuser.select_topics_newuser.selected_options);
   console.log(selectedSkills);
 // open new modal view to add new skill
@@ -192,7 +184,7 @@ app.view('modal-newuser', async({ ack, view, body, say, client }) => {
     console.log(skills);
     try {
       // add user name, id, and graduation year to users collection
-      await data.addUser(body.user.name, body.user.id, year);
+      await data.addUser(values.student_name.student_name.value, body.user.id, year);
       //add user and skills to topics-user collection
       for (skill of skills){
         await data.addTopicToUser(body.user.id, skill);
@@ -205,7 +197,7 @@ app.view('modal-newuser', async({ ack, view, body, say, client }) => {
             type: "section",
             text: {
               type: "mrkdwn",
-              text: `All done! Thank you for joining, <@${body.user.id}>!`
+              text: `All done! Thank you for joining ${values.student_name.student_name.value}!`
             },
           },
           {
@@ -271,39 +263,179 @@ app.view('modal_addskill', async({ ack, view, response, body, say, client }) => 
   else {
     await ack();
     let skill_list = body.view.private_metadata.split('_')[3].split(',');
-    skill_list.push(formattedSkill.trim());
+    skill_list.push(formattedSkill);
+    console.log(skill_list);
     let selected_skill_list = await parse.formatSkillList(skill_list);
+    console.log(selected_skill_list);
     let channel = body.view.private_metadata.split('_')[0];
     let timestamp = body.view.private_metadata.split('_')[1];
-    console.log(channel);
-    console.log(timestamp);
+    console.log(`channel ${channel}: ${timestamp}`);
     try {
       // Add to MongoDB database
       await data.addNewSkill(values.add_Topic.add_Topic.selected_option.value, formattedSkill);
-      clearNewUserInfo = await views.newUserInformation(channel, timestamp);
-      clearNewUserInfo.blocks[2] = await views.clearSkillList();
-      updateNewUserInfo = await views.newUserInformation(channel, timestamp);
-      updateNewUserInfo.blocks[2] = await views.updateSkillList(selected_skill_list);
-      await client.views.update({
-        view_id: body.view.root_view_id,
-        hash: body.view.private_metadata.split('_')[2],
-        view: clearNewUserInfo
-      });
-      await client.views.update({
-        view_id: body.view.root_view_id,
-        view: updateNewUserInfo
+      // Determine whether to show updated new user form or edit profile form
+      if (await data.userExists(message.user)) {
+        // set view back to editProfile view
+        clearEditProfile = await views.editUserInformation(channel, timestamp, body.user.id);
+        // clear block 3 of inputs
+        clearEditProfile.blocks[3] = await views.clearSkillList();
+        // update view to show "...updating tpoics..."
+        await client.views.update({
+          view_id: body.view.root_view_id,
+          hash: body.view.private_metadata.split('_')[2],
+          view: clearEditProfile
+        });
+        // forcefully add new skill to list of topics
+        let topicsList = await data.formatSkillToOptionsGroup(skill_list);
+        updateEditProfile = await views.editUserInformation(channel, timestamp, body.user.id);
+        // modify select skills block by adding all selected skills
+        // (including new skill) into topics list
+        updateEditProfile.blocks[3] = await views.updateSkillList(selected_skill_list, topicsList);
+        // update view to show selected skills
+        await client.views.update({
+          view_id: body.view.root_view_id,
+          view: updateEditProfile
+        });
+      }
+      else {
+        // set view back to newUserInformation view
+        clearNewUserInfo = await views.newUserInformation(channel, timestamp);
+        // clear block 3 of inputs
+        clearNewUserInfo.blocks[3] = await views.clearSkillList();
+        // update view to show "...updating tpoics..."
+        await client.views.update({
+          view_id: body.view.root_view_id,
+          hash: body.view.private_metadata.split('_')[2],
+          view: clearNewUserInfo
+        });
+        // forcefully add new skill to list of topics
+        let topicsList = await data.formatSkillToOptionsGroup(skill_list);
+        updateNewUserInfo = await views.newUserInformation(channel, timestamp);
+        // modify select skills block by adding all selected skills
+        // (including new skill) into topics list
+        updateNewUserInfo.blocks[3] = await views.updateSkillList(selected_skill_list, topicsList);
+        // update view to show selected skills
+        await client.views.update({
+          view_id: body.view.root_view_id,
+          view: updateNewUserInfo
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+ }
+});
+
+
+/* USER EDIT PROFILE */
+
+// ACTION: User clicks the button to edit profile
+// RESPONSE: Open modal view to allow user to edit profile
+app.action('button_edit', async({ ack, view, response, body, say, client }) => {
+  console.log(await data.userInfo(body.user.id));
+  console.log(await data.userSkill(body.user.id));
+  await ack();
+  try {
+    // Open the modal for creating an EliCIT profile
+    const result = await client.views.open({
+      // Pass a valid trigger_id within 3 seconds of receiving it
+      trigger_id: body.trigger_id,
+      // Pass a valid view_id
+      // View payload
+      view: await views.editUserInformation(body.channel.id, body.container.message_ts, body.user.id)
+    });
+    console.log(`channel id: ${body.channel.id}`);
+    console.log(`container message: ${body.container.message_ts}`);
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+// ACTION: User clicks the modal submit button
+// RESPONSE: Extraction of name, graduation year and skills
+app.view('modal-editProfile', async({ ack, view, body, say, client }) => {
+  let values = view.state.values;
+  let year = values.select_year.graduation_year.value;
+  if (year > 1900 && year < 2040){
+    // acknowlege modal submission
+    await ack();
+    // parse through selected skills
+    let new_skills = parse.getValuesFromOptions(values.select_topics_newuser.select_topics_newuser.selected_options);
+    console.log(new_skills);
+    //UPDATING USER INFO
+    try {
+      // Update user name, id, and graduation year to "users" collection
+      await data.userUpdateInfo(values.student_name.student_name.value, body.user.id, year);
+      // store user's original skills
+      let old_skills = await data.userSkill(body.user.id);
+      // Determine what skills to keep
+      let toKeep = await parse.toKeepSkillList(old_skills, new_skills);
+      // Determine what skills to delete
+      let toDelete = await parse.toDeleteSkillList(toKeep, old_skills);
+      console.log(`Delete: ${toDelete}`);
+      // Remove skill in toDelete array from "topics-users" database
+      for (skill of toDelete){
+        /* PHILIPP'S CODE */
+      }
+      // Determine what skills to add
+      let toAdd = await parse.toAddSkillList(toKeep, new_skills);
+      console.log(`Add: ${toAdd}`);
+      // Add skill in toAdd array to "topics-users" database
+      for (skill of toAdd){
+        await data.addTopicToUser(body.user.id, skill);
+      }
+      await client.chat.update({
+        channel: view.private_metadata.split('_')[0],
+        ts: view.private_metadata.split('_')[1],
+        blocks: [
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: `Thank you for updating your profile ${values.student_name.student_name.value}!`
+            },
+          },
+          {
+            type: "actions",
+            elements: [
+              {
+                type: "button",
+                text: {
+                  type: "plain_text",
+                  text: "Edit Profile"
+                },
+                style: "primary",
+                action_id: "button_edit"
+              },
+              {
+                type: "button",
+                text: {
+                  type: "plain_text",
+                  text: "Ask a Question"
+                },
+                action_id: "button_question"
+              }
+            ]
+          }
+        ]
       });
     } catch (error) {
       console.log(error);
     }
   }
+  else {
+    // return error of modal submission
+    await ack(
+      {
+        response_action: "errors",
+        errors: {
+          select_year: "Invalid year! Enter a valid year!"
+        }
+      }
+    )
+  }
 });
 
-// /* EDIT PROFILE */
-// app.action('button_edit', async({ ack, view, response, body, say, client }) => {
-//
-// }
-// })
 
 /* USER ASKS A QUESTION */
 
