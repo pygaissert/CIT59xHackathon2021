@@ -57,8 +57,6 @@ const addUser = async function(userName, userId, userYear) {
   });
 }
 
-
-
 const addTopicToUser = async function(userId, topic) {
   // Create new MongoDB client
   let client = newClient();
@@ -81,8 +79,6 @@ const addTopicToUser = async function(userId, topic) {
     client.close();
   });
 }
-
-
 
 
 // FUNCTION: Adds user-inputted skills to the "topics" collection
@@ -207,6 +203,76 @@ const listTopics = async function() {
   client.close();
 }
 
+// FUNCTION: Formats new skill into option_groups JSON object and append to listTopics
+// ARGUMENTS: string of skills
+const formatSkillToOptionsGroup = async function(skillList){
+  // Create new MongoDB client
+  let client = newClient();
+  // Connect client to MongoDB cluster
+  await client.connect();
+  // Get "topics" collection from "app-data" database
+  collection = await client.db("app-data").collection("topics");
+  // Empty array to store option_groups for select menu
+  let option_groups = [];
+  // Get array of distinct topic groups (strings) from "topics" collection
+  let topic_groups = await collection.distinct("group");
+  // Iterate over the topic groups
+  for (group of topic_groups) {
+    // Empty array to store options in current option_group
+    let options = [];
+    // Get topics in current topic group, and add formatted JSON to options[]
+    await collection.find({group:group}).sort({"name": 1}).forEach( function(topic) {
+      options.push(
+        {
+          text: {
+            type: 'plain_text',
+            text: topic.name
+          },
+          value: topic.name
+        });
+      });
+    // After topics have been added to options[], add formatted JSON to option_groups[]
+    option_groups.push(
+      {
+        label: {
+          type: "plain_text",
+          text: group
+        },
+        options: options
+      }
+    );
+  }
+  // Disconnect client from MongoDB cluster
+  client.close();
+  // Empty array to store skill in option_group
+  let options = [];
+  // Store each new skill in options
+  for (skill of skillList){
+    options.push(
+      {
+        text: {
+          type: 'plain_text',
+          text: skill
+        },
+        value: skill
+      }
+    );
+  }
+  // After topics have been added to options[], add formatted JSON to option_groups[]
+  option_groups.push(
+    {
+      label: {
+        type: "plain_text",
+        text: "User Selected Skill(s)"
+      },
+      options: options
+    }
+  );
+  return option_groups;
+}
+
+
+
 // FUNCTION: Returns an array of all users in "users" collection
 const listUsers = async function() {
   // Create new MongoDB client
@@ -223,8 +289,6 @@ const listUsers = async function() {
   });
   return user_list;
 }
-
-
 
 // FUNCTION: Returns an option_groups JSON of users grouped by topics
 // ARGUMENTS: topics (String[])
@@ -405,5 +469,6 @@ module.exports = {
   getProfileById: getProfileById,
   getAllProfile: getAllProfile,
   listGroups: listGroups,
-  findSkillInList: findSkillInList
+  findSkillInList: findSkillInList,
+  formatSkillToOptionsGroup: formatSkillToOptionsGroup
 }

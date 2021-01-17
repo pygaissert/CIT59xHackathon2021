@@ -184,7 +184,7 @@ app.view('modal-newuser', async({ ack, view, body, say, client }) => {
     console.log(skills);
     try {
       // add user name, id, and graduation year to users collection
-      await data.addUser(body.user.name, body.user.id, year);
+      await data.addUser(values.student_name.student_name.value, body.user.id, year);
       //add user and skills to topics-user collection
       for (skill of skills){
         await data.addTopicToUser(body.user.id, skill);
@@ -197,7 +197,7 @@ app.view('modal-newuser', async({ ack, view, body, say, client }) => {
             type: "section",
             text: {
               type: "mrkdwn",
-              text: `All done! Thank you for joining, <@${body.user.id}>!`
+              text: `All done! Thank you for joining, ${values.student_name.student_name.value}!`
             },
           },
           {
@@ -264,25 +264,32 @@ app.view('modal_addskill', async({ ack, view, response, body, say, client }) => 
     await ack();
     let skill_list = body.view.private_metadata.split('_')[3].split(',');
     skill_list.push(formattedSkill);
+    console.log(skill_list);
     let selected_skill_list = await parse.formatSkillList(skill_list);
     console.log(selected_skill_list);
     let channel = body.view.private_metadata.split('_')[0];
     let timestamp = body.view.private_metadata.split('_')[1];
     console.log(`channel ${channel}: ${timestamp}`);
-    console.log(await data.listTopics());
     try {
       // Add to MongoDB database
       await data.addNewSkill(values.add_Topic.add_Topic.selected_option.value, formattedSkill);
+      // set view back to newUserInformation view
       clearNewUserInfo = await views.newUserInformation(channel, timestamp);
-      clearNewUserInfo.blocks[2] = await views.clearSkillList();
+      // clear block 3 of inputs
+      clearNewUserInfo.blocks[3] = await views.clearSkillList();
+      // update view to show "...updating tpoics..."
       await client.views.update({
         view_id: body.view.root_view_id,
         hash: body.view.private_metadata.split('_')[2],
         view: clearNewUserInfo
       });
-      let topicsList = await data.listTopics();
+      // forcefully add new skill to list of topics
+      let topicsList = await data.formatSkillToOptionsGroup(skill_list);
       updateNewUserInfo = await views.newUserInformation(channel, timestamp);
-      updateNewUserInfo.blocks[2] = await views.updateSkillList(selected_skill_list, topicsList);
+      // modify select skills block by adding all selected skills
+      // (including new skill) into topics list
+      updateNewUserInfo.blocks[3] = await views.updateSkillList(selected_skill_list, topicsList);
+      // update view to show selected skills
       await client.views.update({
         view_id: body.view.root_view_id,
         view: updateNewUserInfo

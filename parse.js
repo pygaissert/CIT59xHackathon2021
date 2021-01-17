@@ -70,7 +70,7 @@ const formatSkillList = async function(list) {
   return selectedSkills;
 }
 
-//Capitalizes the first letter of each word of a string
+// Capitalizes the first letter of each word of a string
 const capitalize = function(skill_input){
   let skill_array = skill_input.split(" ");
   let formatted_skill = "";
@@ -81,6 +81,8 @@ const capitalize = function(skill_input){
   //console.log(formatted_skill);
   return formatted_skill;
 }
+
+
 
 module.exports = {
   isOptionGroupEmpty: isOptionGroupEmpty,

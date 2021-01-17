@@ -6,7 +6,8 @@ const data = require('./data');
 
 /* GREETINGS */
 
-// FUNCTION: Returns a view JSON object for a message to a user not in the "users" collection
+// FUNCTION: Returns a view JSON object for a message to a user not in the
+//           "users" collection
 // ARGUMENT: userID (String)
 const newUserGreeting = function (userID) {
   return {
@@ -45,7 +46,8 @@ const newUserGreeting = function (userID) {
   }
 };
 
-// FUNCTION: Returns a view JSON object for a message to a user in the "users" collection
+// FUNCTION: Returns a view JSON object for a message to a user
+//           in the "users" collection
 // ARGUMENT: userID (String)
 const existingUserGreeting = function (userID) {
   return {
@@ -84,6 +86,8 @@ const existingUserGreeting = function (userID) {
   }
 };
 
+
+
 /* NEW USER FORM */
 
 // FUNCTION: Returns a view JSON object for the Create Profile view
@@ -117,6 +121,23 @@ const newUserInformation = async function (channel, timestamp) {
           text: "Welcome to Elicit! To participate, tell us about yourself! :bust_in_silhouette:"
         }
       },
+      {
+        type: "input",
+        block_id: "student_name",
+        element: {
+          type: "plain_text_input",
+          action_id: "student_name",
+          placeholder: {
+            type: "plain_text",
+            text: "ie: John Smith"
+          }
+        },
+        label: {
+          type: "plain_text",
+          text: "Enter your Full Name",
+          emoji: true
+        }
+      },
       // Static select button for student status
       {
         type: "input",
@@ -141,14 +162,14 @@ const newUserInformation = async function (channel, timestamp) {
         block_id: "select_topics_newuser",
         text: {
           type: "mrkdwn",
-          text: "List your skills of expertise :memo:"
+          text: "*List your skills of expertise* :memo:"
         },
         accessory: {
           action_id: "select_topics_newuser",
           type: "multi_static_select",
           placeholder: {
             type: "plain_text",
-            text: "Programming Languages, data visualization, ..."
+            text: "Programming Languages, Data Visualization, . . ."
           },
           option_groups: topicList
         }
@@ -158,7 +179,7 @@ const newUserInformation = async function (channel, timestamp) {
         block_id: "add_new_skill",
         text: {
           type: "mrkdwn",
-          text: "Don't see your skills listed above?"
+          text: "*Don't see your skills listed above?*"
         },
         accessory: {
           type: "button",
@@ -175,8 +196,46 @@ const newUserInformation = async function (channel, timestamp) {
   }
 };
 
-/* ADDING NEW SKILLS TO ELICIT */
+// FUNCTION: block format for new user and edit profile form by clearing block 3
+const clearSkillList = async function() {
+  let topicList = await data.listTopics();
+  return {
+    // List skills from a external multi-select
+    type: "section",
+    block_id: "select_topics_newuser",
+    text: {
+      type: "mrkdwn",
+      text: "*. . . Loading Updated Topics . . .*"
+    }
+  }
+}
 
+// FUNCTION: block format for new user and edit profile form by updating
+//           selected skills and topics list in block 3
+// ARGUMENT: selectedList (array of string), topicList (array of string)
+const updateSkillList = async function(selectedList, topicList) {
+  return {
+    // List skills from a external multi-select
+    type: "section",
+    block_id: "select_topics_newuser",
+    text: {
+      type: "mrkdwn",
+      text: "*List your skills of expertise* :memo:"
+    },
+    accessory: {
+      action_id: "select_topics_newuser",
+      type: "multi_static_select",
+      placeholder: {
+        type: "plain_text",
+        text: "Programming Languages, Data Visualization, . . ."
+      },
+      initial_options: selectedList,
+      option_groups: topicList
+    }
+  }
+}
+
+/* ADDING NEW SKILLS TO ELICIT */
 const addSkill = async function (channel, timestamp, hash, skillList) {
   let topicList = await data.listGroups();
   return {
@@ -227,7 +286,7 @@ const addSkill = async function (channel, timestamp, hash, skillList) {
           action_id: "add_Skill",
           placeholder: {
             type: "plain_text",
-            text: "Type a skill"
+            text: "Type A Skill"
           }
         },
         label: {
@@ -240,43 +299,6 @@ const addSkill = async function (channel, timestamp, hash, skillList) {
   }
 };
 
-/* UPDATE SKILL LIST VIA CLEARING BLOCK 2 */
-const clearSkillList = async function() {
-  let topicList = await data.listTopics();
-  return {
-    // List skills from a external multi-select
-    type: "section",
-    block_id: "select_topics_newuser",
-    text: {
-      type: "mrkdwn",
-      text: "List your skills of expertise"
-    }
-  }
-}
-
-/* UPDATE SKILL LIST */
-const updateSkillList = async function(selectedList, topicList) {
-//  let topicsList = await data.listTopics();
-  return {
-    // List skills from a external multi-select
-    type: "section",
-    block_id: "select_topics_newuser",
-    text: {
-      type: "mrkdwn",
-      text: "List your skills of expertise"
-    },
-    accessory: {
-      action_id: "select_topics_newuser",
-      type: "multi_static_select",
-      placeholder: {
-        type: "plain_text",
-        text: "Programming Languages, Data Visualization, ..."
-      },
-      initial_options: selectedList,
-      option_groups: topicList
-    }
-  }
-}
 
 /* QUESTION FORM */
 
