@@ -50,48 +50,27 @@ const addUser = async function(userName, userId, userYear) {
 }
 
 // Add user id and skill (topic) into topics-users collection
-const addUserSkill = async function(userId, skillList) {
+const addTopicToUser = async function(userId, topic) {
   // Create new MongoDB client
   let client = newClient();
   // Connect client to MongoDB cluster
   await client.connect();
-  // Get "users" collection from "app-data" database
+  // Get "topics-users"
   collection = await client.db("app-data").collection("topics-users");
-  for (skill of skillList) {
-    topic = {
-      user: userId,
-      topic: skill
-    }
-    await collection.insertOne(topic, {w: 1}, function(err, doc) {
-      if (err) {
-        console.log(err);
-        process.exit(0);
-      }
-      let saved = doc.ops[0];
-      console.log(`${saved.user}: ${saved.topic})`);
-  });
+  relation = {
+    topic: topic,
+    slack_id: userId
   }
+  await collection.insertOne(relation, {w: 1}, function(err, doc) {
+    if (err) {
+      console.log(err);
+      process.exit(0);
+    }
+    let saved = doc.ops[0];
+    console.log(`${saved.slack_id}: ${saved.topic}`);
     // Disconnect client from MongoDB cluster
     client.close();
-}
-
-// format selected skills into options block for update NewUserView
-const formatSkillList = async function(list) {
-  console.log()
-  let selectedSkills = [];
-  for (i = 0; i < list.length; i++){
-    selectedSkills.push(
-      {
-        text: {
-          type: "plain_text",
-          text: list[i],
-          emoji: true
-        },
-        value: list[i]
-      }
-    );
-  }
-  return selectedSkills;
+  });
 }
 
 // Adds user inputted skill into database
@@ -148,6 +127,30 @@ const listGroups = async function() {
   client.close();
 }
 
+// Returns true if new user skill is a duplicate
+const findSkillInList = async function(new_skill) {
+  // Create new MongoDB client
+  let client = newClient();
+  // Connect client to MongoDB cluster
+  await client.connect();
+  // Get "topics" collection from "app-data" database
+  collection = await client.db("app-data").collection("topics");
+  // Get array of distinct topic groups (strings) from "topics" collection
+  let skillList = await collection.distinct("name");
+  // Disconnect client from MongoDB cluster
+  client.close();
+  // create a switch to determine if there is a duplicate
+  let dup_switch = false;
+  // Iterate over the skillList to find a match
+  for (skill of skillList) {
+    if (skill.trim() == new_skill.trim()){
+      dup_switch = true;
+      break;
+    }
+  }
+  //console.log(dup_switch);
+  return dup_switch;
+}
 
 // Returns all skills sorted by group, formatted as [{ options: [{},...] },...]
 const listTopics = async function() {
@@ -207,29 +210,6 @@ const listUsers = async function() {
   return user_list;
 }
 
-const addTopicToUser = async function() {
-  // Create new MongoDB client
-  let client = newClient();
-  // Connect client to MongoDB cluster
-  await client.connect();
-  // Get "topics-users"
-  collection = await client.db("app-data").collection("topics-users");
-  relation = {
-    topic: topic,
-    slack_id: userId
-  }
-  await collection.insertOne(relation, {w: 1}, function(err, doc) {
-    if (err) {
-      console.log(err);
-      process.exit(0);
-    }
-    let saved = doc.ops[0];
-    console.log(`${saved._id}: ${saved.name} (${saved.slack_id})`);
-    // Disconnect client from MongoDB cluster
-    client.close();
-  });
-}
-
 const findUsersByTopics = async function(topics) {
   // Create new MongoDB client
   let client = newClient();
@@ -286,7 +266,6 @@ const getProfileById = async function(user_id){
   // get user document
   let user = await collectionUsers.findOne({slack_id:user_id});
 
-  console.log(user_id)
   // get user graduating year:
   res.push(user.year);
 
@@ -336,7 +315,7 @@ const getAllProfile = async function(){
     // // push user_id
     // temp.push(u);
 
-    temp.push(u);
+    temp.push(user.name);
     // push year
     temp.push(user.year);
 
@@ -358,7 +337,6 @@ const getAllProfile = async function(){
 
 module.exports = {
   addUser: addUser,
-  addUserSkill: addUserSkill,
   userExists: userExists,
   listTopics:listTopics,
   listUsers:listUsers,
@@ -368,5 +346,5 @@ module.exports = {
   getProfileById: getProfileById,
   getAllProfile: getAllProfile,
   listGroups: listGroups,
-  formatSkillList: formatSkillList
+  findSkillInList: findSkillInList
 }

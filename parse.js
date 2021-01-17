@@ -1,6 +1,36 @@
 // parse.js
 // This is a module of helper functions for parsing JSON objects
 
+// format selected skills into options block for update NewUserView
+const formatSkillList = async function(list) {
+  let selectedSkills = [];
+  for (i = 0; i < list.length; i++){
+    selectedSkills.push(
+      {
+        text: {
+          type: "plain_text",
+          text: list[i],
+          emoji: true
+        },
+        value: list[i]
+      }
+    );
+  }
+  return selectedSkills;
+}
+
+//Capitalizes the first letter of each word of a string
+const capitalize = function(skill_input){
+  let skill_array = skill_input.split(" ");
+  let formatted_skill = "";
+//  console.log(skill_array);
+  for (word of skill_array){
+    formatted_skill+= word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() + " ";
+  }
+  //console.log(formatted_skill);
+  return formatted_skill;
+}
+
 // Checks if an array of option_groups contains any empty option_groups
 // (INCOMPLETE, CURRENTLY UNUSED)
 const isOptionGroupEmpty = function(option_groups) {
@@ -49,6 +79,8 @@ const parseQuestionSubmission = function(view, user) {
 }
 
 module.exports = {
+  formatSkillList: formatSkillList,
+  capitalize: capitalize,
   isOptionGroupEmpty: isOptionGroupEmpty,
   getValuesFromOptions: getValuesFromOptions,
   parseQuestionSubmission: parseQuestionSubmission
