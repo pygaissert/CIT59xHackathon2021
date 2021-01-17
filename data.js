@@ -391,6 +391,98 @@ const getAllProfile = async function(){
   return res;
 }
 
+
+// function to to get user profile in array, by user id
+// TODO: change user_id formated string when database is implemented
+const getProfileByIdForEdit = async function(user_id){
+
+  // // return values: two strings, year and expertise
+  // let res = [];
+
+  // Create new MongoDB client
+  let client = newClient();
+  // Connect client to MongoDB cluster
+  await client.connect();
+
+  // get skills:
+  // get two collections
+  let collectionUserTopic = await client.db("app-data").collection("topics-users");
+  let collectionUsers = await client.db("app-data").collection("users");
+  let collectionTopics = collection = await client.db("app-data").collection("topics");
+
+  // // get user document
+  // let user = await collectionUsers.findOne({slack_id:user_id});
+  //
+  // console.log(user_id)
+  // // get user graduating year:
+  // res.push(user.year);
+
+  //
+  // // array to store expertise in option elements of given user_id
+  // let exList = [];
+  // // Get topics associated with given user_id, add to array
+  // await collectionUserTopic.find({user:user_id}).sort({"topic":1}).forEach( function(item) {
+  //   // push topic as option object
+  //   exList.push(
+  //     {
+  //       "text": {
+  //         "type": 'plain_text',
+  //         "text": item.topic
+  //       },
+  //       "value": item.topic
+  //     });
+  // });
+
+  let option_groups = [];
+
+  let topic_groups = await collectionTopics.distinct("group");
+  console.log("Option Groups:");
+  console.log(topic_groups);
+
+  let check = true;
+
+  // Iterate over the topic groups
+  for (group of topic_groups) {
+    // Empty array to store options in current option_group
+    let options = [];
+    // Get topics in current topic group, and add formatted JSON to options[]
+    await collectionUserTopic.find({user:user_id, group:group}).sort({"name": 1}).forEach( function(topic) {
+      check = false;
+      options.push(
+        {
+          "text": {
+            "type": 'plain_text',
+            "text": item.topic
+          },
+          "value": item.topic
+        });
+    });
+
+    if (!check){
+      // After topics have been added to options[], add formatted JSON to option_groups[]
+      option_groups.push(
+        {
+          label: {
+            type: "plain_text",
+            text: group
+          },
+          options: options
+        });
+    }
+
+    }
+  //
+  //
+  // res.push(exList);
+
+  // return exList;
+  console.log("Return:");
+  console.log(option_groups);
+
+  return option_groups;
+}
+
+
 // MODULE EXPORTS
 module.exports = {
   addUser: addUser,
@@ -403,5 +495,6 @@ module.exports = {
   getProfileById: getProfileById,
   getAllProfile: getAllProfile,
   listGroups: listGroups,
-  findSkillInList: findSkillInList
+  findSkillInList: findSkillInList,
+  getProfileByIdForEdit:getProfileByIdForEdit
 }
