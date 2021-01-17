@@ -1,36 +1,6 @@
 // parse.js
 // This is a module of helper functions for parsing JSON objects
 
-// format selected skills into options block for update NewUserView
-const formatSkillList = async function(list) {
-  let selectedSkills = [];
-  for (i = 0; i < list.length; i++){
-    selectedSkills.push(
-      {
-        text: {
-          type: "plain_text",
-          text: list[i],
-          emoji: true
-        },
-        value: list[i]
-      }
-    );
-  }
-  return selectedSkills;
-}
-
-//Capitalizes the first letter of each word of a string
-const capitalize = function(skill_input){
-  let skill_array = skill_input.split(" ");
-  let formatted_skill = "";
-//  console.log(skill_array);
-  for (word of skill_array){
-    formatted_skill+= word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() + " ";
-  }
-  //console.log(formatted_skill);
-  return formatted_skill;
-}
-
 // Checks if an array of option_groups contains any empty option_groups
 // (INCOMPLETE, CURRENTLY UNUSED)
 const isOptionGroupEmpty = function(option_groups) {
@@ -43,8 +13,8 @@ const isOptionGroupEmpty = function(option_groups) {
   console.log(empty_groups);
 }
 
-
-// Returns an array of values parsed from an array of JSON option objects
+// FUNCTION: Returns an array of values parsed from an array of JSON options
+// ARGUMENT: options (JSON[])
 const getValuesFromOptions = function(options) {
   let values = [];
   options.forEach( function(option) {
@@ -53,11 +23,12 @@ const getValuesFromOptions = function(options) {
   return values;
 }
 
-// Parses the view_submission from the Question Form and returns
-// a JSON object with fields necessary for sending their question
-// .topics = comma-separated topics relating to the question (String)
-// .users = comma-separated Slack IDs of the users to send the question to (String)
-// .question = the question (String)
+// FUNCTION: Parses the view_submission from the Question Form and returns
+//           a JSON object with fields necessary for sending their question
+//           .topics = comma-separated topics relating to the question (String)
+//           .users = comma-separated Slack IDs of the users to send the question to (String)
+//           .question = the question (String)
+// ARGUMENTS: view (JSON), user (String)
 const parseQuestionSubmission = function(view, user) {
   // Parse the array of selected topics from the view_submission and join into a String
   topics = getValuesFromOptions(view.state.values.select_topics_question.select_topics_question.selected_options).join(', ');
@@ -79,10 +50,29 @@ const parseQuestionSubmission = function(view, user) {
   }
 }
 
+// FUNCTION: Formats selected skills into options JSON object
+// ARGUMENTS: list (String[])
+const formatSkillList = async function(list) {
+  console.log()
+  let selectedSkills = [];
+  for (i = 0; i < list.length; i++){
+    selectedSkills.push(
+      {
+        text: {
+          type: "plain_text",
+          text: list[i],
+          emoji: true
+        },
+        value: list[i]
+      }
+    );
+  }
+  return selectedSkills;
+}
+
 module.exports = {
-  formatSkillList: formatSkillList,
-  capitalize: capitalize,
   isOptionGroupEmpty: isOptionGroupEmpty,
   getValuesFromOptions: getValuesFromOptions,
-  parseQuestionSubmission: parseQuestionSubmission
+  parseQuestionSubmission: parseQuestionSubmission,
+  formatSkillList: formatSkillList
 }

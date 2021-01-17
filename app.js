@@ -184,103 +184,7 @@ app.action('add_Skill', async({ ack, body, say, client}) => {
 app.view('modal-newuser', async({ ack, view, body, say, client }) => {
   let values = view.state.values;
   let year = values.select_year.graduation_year.value;
-  if (year > 1900 && year < 2040){
-    // acknowlege modal submission
-    await ack();
-    parse through selected skills
-    let skills = parse.getValuesFromOptions(values.select_topics_newuser.select_topics_newuser.selected_options);
-    console.log(skills);
-    try {
-      // add user name, id, and graduation year to users collection
-      await data.addUser(body.user.name, body.user.id, year);
-      //add user and skills to topics-user collection
-      for (skill of skills){
-        await data.addTopicToUser(body.user.id, skill);
-      }
-      await client.chat.update({
-  //     //   // COMBINE THIS.........
-  //     //   channel: body.channel.id,
-  //     //   ts: body.container.message_ts,
-        blocks: [
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: "Profile successfully added to database!"
-            },
-          },
-          {
-            type: "actions",
-            elements: [
-              {
-                type: "button",
-                text: {
-                  type: "plain_text",
-                  text: "Edit Profile"
-                },
-                style: "primary",
-                action_id: "button_edit"
-              },
-              {
-                type: "button",
-                text: {
-                  type: "plain_text",
-                  text: "Ask a Question"
-                },
-                action_id: "button_question"
-              }
-            ]
-          }
-        ],
-  //     //   // .......WITH THIS
-        channel: view.private_metadata.split('_')[0],
-        ts: view.private_metadata.split('_')[1],
-        blocks: [
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: `All done! Thank you for joining, <@${body.user.id}>!`
-            },
-          },
-          {
-            type: "actions",
-            elements: [
-              {
-                type: "button",
-                text: {
-                  type: "plain_text",
-                  text: "Edit Profile"
-                },
-                style: "primary",
-                action_id: "button_edit"
-              },
-              {
-                type: "button",
-                text: {
-                  type: "plain_text",
-                  text: "Ask a Question"
-                },
-                action_id: "button_question"
-              }
-            ]
-          }
-        ]
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  else {
-    // return error of modal submission
-    await ack(
-      {
-        response_action: "errors",
-        errors: {
-          select_year: "Invalid year! Enter a valid year!"
-        }
-      }
-    )
+
   }
 });
 
@@ -365,27 +269,66 @@ app.action('select_topics_question', async({ ack, body, action, client }) => {
   // Acknowledge the selection
   await ack();
   console.log("Acknowledged - Topic Selected");
-  // Create a new identical question form view
-  updatedQuestionForm = await views.questionForm();
-  // Check if there are topics selected
+  // Create a new identical Question Form view
+  let updatedQuestionForm = await views.questionForm();
+  // Check any topics were selected
   if (action.selected_options.length == 0) {
+    // If there are no topics selected, give the updated view an empty 3rd block
     updatedQuestionForm.blocks[2] = views.noTopicsSelected;
   } else {
-    // Parse values from selected options
+    // If there are still topics selected...
+    // Parse an array of selected topics from action.selected_options
     let updatedTopicsList = parse.getValuesFromOptions(action.selected_options);
-    // Get list of Slack IDs associated with the selected topics
-    relatedUserList = await data.findUsersByTopics(updatedTopicsList);
-    // Check if related users were found
+    // Get list of users associated with the selected topics
+    let relatedUserList = await data.findUsersByTopics(updatedTopicsList);
+    // Check if any users were found
     if (relatedUserList.length == 0) {
+      // If no users were found, give the updated view a 3rd block with a message
       updatedQuestionForm.blocks[2] = await views.noUsersFound(updatedTopicsList);
     } else {
-      updatedQuestionForm.blocks[2] = await views.usersSelected(relatedUserList);
+      // If users were found...
+      // Give the updated view a 3rd block with a multi-select menu for selecting users
+      updatedQuestionForm.blocks[2] = await views.usersFound(relatedUserList);
+      // Check if there were users already selected before
+      if (body.view.state.values.select_users_question) {
+          // If users were already selected...
+          // Get the list of previously selected users as a JSON object
+          previouslySelectedUsers = body.view.state.values.select_users_question.select_users_question.selected_options;
+          // This array will hold the initial_options for the multi-select menu
+          updatedSelectedUsers = [];
+          // For each of the previously selected users...
+          previouslySelectedUsers.forEach( (user) => {
+            // Check if they are still in the selectable users, given the selected topic(s)
+            updatedQuestionForm.blocks[2].accessory.option_groups.forEach( (group) => {
+              // Ensure that there are no duplicates in the initial_options
+              if (updatedSelectedUsers.includes(user)) {
+                return;
+              }
+              // If a previously selected user is related to any of the currently selected topics...
+              if (parse.getValuesFromOptions(group.options).includes(user.value)) {
+                // Add them to the array
+                updatedSelectedUsers.push(user);
+              }
+            });
+          });
+          // If the array is not empty
+          if (updatedSelectedUsers.length != 0) {
+            updatedQuestionForm.blocks[2].accessory.initial_options = updatedSelectedUsers;
+          }
+        }
+      }
     }
-  }
+
   // Update the Question Form modal (INCOMPLETE)
   tempForm = await views.questionForm();
   tempForm.blocks[2] = views.noTopicsSelected;
   try {
+    await client.views.update({
+      token: slackBotToken,
+      view: tempForm,
+      view_id: body.view.id,
+      hash: body.view.hash,
+    });
     await client.views.update({
       token: slackBotToken,
       view: updatedQuestionForm,
