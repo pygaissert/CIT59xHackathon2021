@@ -79,6 +79,14 @@ const existingUserGreeting = function (userID) {
               "text": "Ask a Question"
             },
             "action_id": "button_question"
+          },
+          {
+            "type": "button",
+            "text": {
+              "type": "plain_text",
+              "text": "View classmates profiles"
+            },
+            "action_id": "button_profiles"
           }
         ]
       }
