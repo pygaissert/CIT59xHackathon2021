@@ -246,7 +246,7 @@ const clearSkillList = async function() {
   return {
     // List skills from a external multi-select
     type: "section",
-    block_id: "select_skill",
+    block_id: "select_topics_newuser",
     text: {
       type: "mrkdwn",
       text: "List your skills of expertise"
@@ -255,18 +255,18 @@ const clearSkillList = async function() {
 }
 
 /* UPDATE SKILL LIST */
-const updateSkillList = async function(selectedList) {
-  let topicList = await data.listTopics();
+const updateSkillList = async function(selectedList, topicList) {
+//  let topicsList = await data.listTopics();
   return {
     // List skills from a external multi-select
     type: "section",
-    block_id: "select_skill",
+    block_id: "select_topics_newuser",
     text: {
       type: "mrkdwn",
       text: "List your skills of expertise"
     },
     accessory: {
-      action_id: "select_topics_newuser2",
+      action_id: "select_topics_newuser",
       type: "multi_static_select",
       placeholder: {
         type: "plain_text",

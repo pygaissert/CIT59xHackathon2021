@@ -139,20 +139,12 @@ app.action('select_topics_newuser', async({ ack, body, say, client }) => {
   await ack();
 });
 
-// ACTION: multi_static_select-action
-// RESPONSE: Acknowledge multi-select skills updated
-app.action('select_topics_newuser2', async({ ack, body, say, client }) => {
-  // print out info
-  // console.log(body.actions.selected_options);
-  // Acknowledge selection of skill
-  await ack();
-});
-
 // ACTION:   button_addSkill
 // RESPONSE: Acknowledge skills selection and open add_skill modal
 app.action('button_addSkill', async({ ack, view, body, say, client }) => {
   // Acknowledge addSkill button
   await ack();
+  console.log(body.view.state);
   let selectedSkills = parse.getValuesFromOptions(body.view.state.values.select_topics_newuser.select_topics_newuser.selected_options);
   console.log(selectedSkills);
 // open new modal view to add new skill
@@ -271,24 +263,26 @@ app.view('modal_addskill', async({ ack, view, response, body, say, client }) => 
   else {
     await ack();
     let skill_list = body.view.private_metadata.split('_')[3].split(',');
-    skill_list.push(formattedSkill.trim());
+    skill_list.push(formattedSkill);
     let selected_skill_list = await parse.formatSkillList(skill_list);
+    console.log(selected_skill_list);
     let channel = body.view.private_metadata.split('_')[0];
     let timestamp = body.view.private_metadata.split('_')[1];
-    console.log(channel);
-    console.log(timestamp);
+    console.log(`channel ${channel}: ${timestamp}`);
+    console.log(await data.listTopics());
     try {
       // Add to MongoDB database
       await data.addNewSkill(values.add_Topic.add_Topic.selected_option.value, formattedSkill);
       clearNewUserInfo = await views.newUserInformation(channel, timestamp);
       clearNewUserInfo.blocks[2] = await views.clearSkillList();
-      updateNewUserInfo = await views.newUserInformation(channel, timestamp);
-      updateNewUserInfo.blocks[2] = await views.updateSkillList(selected_skill_list);
       await client.views.update({
         view_id: body.view.root_view_id,
         hash: body.view.private_metadata.split('_')[2],
         view: clearNewUserInfo
       });
+      let topicsList = await data.listTopics();
+      updateNewUserInfo = await views.newUserInformation(channel, timestamp);
+      updateNewUserInfo.blocks[2] = await views.updateSkillList(selected_skill_list, topicsList);
       await client.views.update({
         view_id: body.view.root_view_id,
         view: updateNewUserInfo
@@ -296,7 +290,7 @@ app.view('modal_addskill', async({ ack, view, response, body, say, client }) => 
     } catch (error) {
       console.log(error);
     }
-  }
+ }
 });
 
 // /* EDIT PROFILE */
