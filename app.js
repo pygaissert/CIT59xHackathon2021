@@ -219,6 +219,14 @@ app.view('modal-newuser', async({ ack, view, body, say, client }) => {
                   text: "Ask a Question"
                 },
                 action_id: "button_question"
+              },
+              {
+                type: "button",
+                text: {
+                  "type": "plain_text",
+                  "text": "View classmates profiles"
+                },
+                action_id: "button_profiles"
               }
             ]
           }
@@ -457,6 +465,7 @@ app.action('button_question',async({ack, body, client}) =>{
   }
 });
 
+
 // ACTION: User selects topics in the Question Form
 // RESPONSE: Update the multi-select menu of users
 app.action('select_topics_question', async({ ack, body, action, client }) => {
@@ -603,19 +612,33 @@ app.event('app_home_opened', async({ event, client }) =>{
 
 /* SLASH COMMANDS */
 // implement these two when above functions are finished
-// edit_profile
-app.command('/edit-profile', async ({ command, ack, say, body, client}) => {
-  // acknowlege the command request
-  console.log("User wants to edit profile ");
-  // add function
-});
-// ask_question
-app.command('/ask-question', async ({ command, ack, say, body, client}) => {
-  // acknowlege the command request
-  await ack();
-  console.log("User wants to ask question ");
-  // add function
-});
+// // edit_profile
+// app.command('/edit-profile', async ({ command, ack, say, body, client}) => {
+//   await ack();
+//
+//   console.log(client);
+//   try {
+//     // Open the modal for creating an EliCIT profile
+//     const result = await client.views.open({
+//       // Pass a valid trigger_id within 3 seconds of receiving it
+//       trigger_id: command.trigger_id,
+//       // Pass a valid view_id
+//       // View payload
+//       view: await views.editUserInformation(command.channel.id, body.container.message_ts, command.user.id)
+//     });
+//     console.log(`channel id: ${body.channel.id}`);
+//     console.log(`container message: ${body.container.message_ts}`);
+//   } catch (error) {
+//     console.error(error);
+//   }
+// });
+// // ask_question
+// app.command('/ask-question', async ({ command, ack, say, body, client}) => {
+//   // acknowlege the command request
+//   await ack();
+//   console.log("User wants to ask question ");
+//   // add function
+// });
 // view_people
 app.command('/view-people', async ({ command, ack, say, body, client}) => {
   // acknowlege the command request
@@ -773,15 +796,15 @@ app.view('dm_rusure', async({ ack, body, view, client }) => {
         ]
       }
     });
-
+    // TODO change this to comma seperated user_id for group message
     // send message
     let result = await client.conversations.open({
       token: slackBotToken,
-      users: body.user.id // TODO change this to comma seperated user_id for group message
+      users: `${body.user.id},${dm_to_id}`
     });
 
     // TODO change user_id implementation
-    let userProfile = await data.getProfileById("U01JMNSEL75");
+    let userProfile = await data.getProfileById(body.user.id);
 
     let msg = await client.chat.postMessage({
       token: slackBotToken,
@@ -811,6 +834,24 @@ app.view('dm_rusure', async({ ack, body, view, client }) => {
       }
     ]
     });
+  } catch (error){
+    console.error(error);
+  }
+});
+
+
+app.action('button_profiles',async({action, ack, body, client}) =>{
+  // acknowlege the command request
+  await ack();
+
+  try {
+    // open modal view from views, list all people currently in the db
+    const result = await client.views.open({
+      trigger_id: body.trigger_id,
+      view: await views.showAllProfiles()
+    });
+
+    console.log(result);
   } catch (error){
     console.error(error);
   }
@@ -847,6 +888,9 @@ app.view('dm_rusure', async({ ack, body, view, client }) => {
 //   });
 //
 // }
+
+
+// integration functions:
 
 
 // STARTS THE APP
