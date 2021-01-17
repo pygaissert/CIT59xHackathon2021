@@ -70,7 +70,7 @@ const existingUserGreeting = function (userID) {
               "text": "View Profile"
             },
             "style": "primary",
-            "action_id": "button_viewProfile"
+            "action_id": "button_viewMyProfile"
           },
           {
             "type": "button",

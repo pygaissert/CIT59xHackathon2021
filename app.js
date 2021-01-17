@@ -207,10 +207,10 @@ app.view('modal-newuser', async({ ack, view, body, say, client }) => {
                 type: "button",
                 text: {
                   type: "plain_text",
-                  text: "Edit Profile"
+                  text: "View Profile"
                 },
                 style: "primary",
-                action_id: "button_edit"
+                action_id: "button_viewMyProfile"
               },
               {
                 type: "button",
@@ -359,7 +359,7 @@ app.action('button_edit', async({ ack, view, response, body, say, client }) => {
 
 // ACTION: User clicks the button to view profile
 // RESPONSE: Open attachment view to allow user to see profile
-app.action('button_viewProfile', async({ command, ack, say, body, client}) => {
+app.action('button_viewMyProfile', async({ command, ack, say, body, client}) => {
   await ack();
   try {
     // write new message, show user's own profile
@@ -429,6 +429,14 @@ app.view('modal-editProfile', async({ ack, view, body, say, client }) => {
                 },
                 style: "primary",
                 action_id: "button_question"
+              },
+              {
+                type: "button",
+                text: {
+                  "type": "plain_text",
+                  "text": "View classmates profiles"
+                },
+                action_id: "button_profiles"
               }
             ]
           }
