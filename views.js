@@ -117,7 +117,7 @@ const newUserInformation = async function (channel, timestamp) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: "Welcome to Elicit! To participate, tell us about yourself!"
+          text: "Welcome to Elicit! To participate, tell us about yourself! :bust_in_silhouette:"
         }
       },
       // Static select button for student status
@@ -134,7 +134,7 @@ const newUserInformation = async function (channel, timestamp) {
         },
         label: {
           type: "plain_text",
-          text: "Graduation Year",
+          text: "Graduation Year  :mortar_board:",
           emoji: true
         }
       },
@@ -144,38 +144,35 @@ const newUserInformation = async function (channel, timestamp) {
         block_id: "select_topics_newuser",
         text: {
           type: "mrkdwn",
-          text: "List your skills of expertise"
+          text: "List your skills of expertise :memo:"
         },
         accessory: {
           action_id: "select_topics_newuser",
           type: "multi_static_select",
           placeholder: {
             type: "plain_text",
-            text: "Programming Languages, data visualization,..."
+            text: "Programming Languages, data visualization, ..."
           },
           option_groups: topicList
         }
       },
       {
         type: "section",
+        block_id: "add_new_skill",
         text: {
           type: "mrkdwn",
           text: "Don't see your skills listed above?"
         },
-      },
-      {
-        type: "actions",
-        elements: [
-          {
-            type: "button",
-            text: {
-              type: "plain_text",
-              text: "Add a new skill"
-            },
-            style: "primary",
-            action_id: "button_addSkill"
-          }
-        ]
+        accessory: {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "Add a new skill",
+            emoji: true
+          },
+          value: "add_new_skill",
+          action_id: "button_addSkill"
+        }
       }
     ]
   }
@@ -183,11 +180,11 @@ const newUserInformation = async function (channel, timestamp) {
 
 /* ADDING NEW SKILLS TO ELICIT */
 
-const addSkill = async function (hash, skillList) {
+const addSkill = async function (channel, timestamp, hash, skillList) {
   let topicList = await data.listGroups();
   return {
     type: "modal",
-    private_metadata: `${hash}_${skillList}`,
+    private_metadata: `${channel}_${timestamp}_${hash}_${skillList}`,
     callback_id: "modal_addskill",
     title: {
       type: "plain_text",
@@ -213,7 +210,7 @@ const addSkill = async function (hash, skillList) {
           type: "static_select",
           placeholder: {
             type: "plain_text",
-            text: "CS Concepts...",
+            text: "Select A Topic",
             emoji: true
           },
           action_id: "add_Topic",
@@ -230,7 +227,11 @@ const addSkill = async function (hash, skillList) {
         block_id: "add_Skill",
         element: {
           type: "plain_text_input",
-          action_id: "add_Skill"
+          action_id: "add_Skill",
+          placeholder: {
+            type: "plain_text",
+            text: "Type a skill"
+          }
         },
         label: {
           type: "plain_text",
@@ -268,11 +269,11 @@ const updateSkillList = async function(selectedList) {
       text: "List your skills of expertise"
     },
     accessory: {
-      action_id: "select_topics_newuser",
+      action_id: "select_topics_newuser2",
       type: "multi_static_select",
       placeholder: {
         type: "plain_text",
-        text: "Programming Languages, data visualization,..."
+        text: "Programming Languages, Data Visualization, ..."
       },
       initial_options: selectedList,
       option_groups: topicList
@@ -725,7 +726,6 @@ const showUserProfile = async function(user_id) {
             // "thumb_url": "https://static.wikia.nocookie.net/spongebob/images/9/96/The_Two_Faces_of_Squidward_174.png/revision/latest/scale-to-width-down/1000?cb=20200923005328",
             // "footer": "footer",
             // "ts": 123456789
-            ,
             "blocks": [
               {
                 "type": "actions",
@@ -868,11 +868,10 @@ module.exports = {
   newUserGreeting: newUserGreeting,
   newUserInformation: newUserInformation,
   addSkill: addSkill,
-
   homepage: homepage,
   showUserProfile: showUserProfile,
   showAllProfiles:showAllProfiles,
-  listProfiles: listProfiles,
+//  listProfiles: listProfiles,
   clearSkillList: clearSkillList,
   updateSkillList: updateSkillList,
   existingUserGreeting: existingUserGreeting,
