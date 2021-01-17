@@ -391,7 +391,6 @@ app.view('submit_question', async({ ack, body, view, client }) => {
 });
 
 // adding some basic function below:
-
 // app homepage
 app.event('app_home_opened', async({ event, client }) =>{
 
@@ -409,7 +408,7 @@ app.event('app_home_opened', async({ event, client }) =>{
 });
 
 /* SLASH COMMANDS */
-// implement these when above functions are finished
+// implement these two when above functions are finished
 // edit_profile
 app.command('/edit-profile', async ({ command, ack, say, body, client}) => {
   // acknowlege the command request
@@ -503,8 +502,8 @@ app.command('/my-profile', async ({ command, ack, say, body, client}) => {
   }
 });
 
-// profiles actions
-// message user by profile:
+// /view-people profiles actions
+// message user by profile, button is pressed
 app.action('button_message_by_profile',async({action, ack, body, client}) =>{
   // Acknowledge the view_submission
   await ack();
@@ -560,8 +559,7 @@ app.action('button_message_by_profile',async({action, ack, body, client}) =>{
     console.error(error);
   }
 });
-
-
+// user confirmed that they want to send dm
 app.view('dm_rusure', async({ ack, body, view, client }) => {
   // Acknowledge the view_submission
   await ack();
@@ -644,6 +642,10 @@ app.view('dm_rusure', async({ ack, body, view, client }) => {
     console.error(error);
   }
 });
+
+
+
+// IMPLEMENTING edit profile
 
 
 
