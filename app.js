@@ -368,7 +368,6 @@ app.view('modal-editProfile', async({ ack, view, body, say, client }) => {
       await data.userUpdateInfo(values.student_name.student_name.value, body.user.id, year);
       // store user's original skills
       let old_skills = await data.userSkill(body.user.id);
-
       // Determine what skills to keep
       let toKeep = await parse.toKeepSkillList(old_skills, new_skills);
       // Determine what skills to delete
