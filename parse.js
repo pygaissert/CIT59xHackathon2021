@@ -1,6 +1,7 @@
 // parse.js
 // This is a module of helper functions for parsing JSON objects
 
+
 // format selected skills into options block for update NewUserView
 const formatSkillList = async function(list) {
   let selectedSkills = [];

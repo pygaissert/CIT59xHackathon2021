@@ -1,6 +1,7 @@
 // data.js
 // This is a module for interacting with the MongoDB database
 
+
 // FOR INITIALIZING MONGODB CLIENTS
 const MongoClient = require('mongodb').MongoClient;
 const uri = process.env.MONGODB_CONNECTION;
