@@ -510,6 +510,8 @@ app.command('/my-profile', async ({ command, ack, say, body, client}) => {
     // write new message, show user's own profile
     const result = await say(
       await views.showUserProfile("U01JMNX5NSF")
+      // await views.showUserProfile(body.user_id)
+
     );
   } catch (error){
     console.error(error);
@@ -562,7 +564,7 @@ app.action('button_message_by_profile',async({action, ack, body, client}) =>{
       			type: "section",
       			text: {
       				type: "mrkdwn",
-      				text: `:bust_in_silhouette:  *${dm_id}*\n\n :mortar_board:  *${userInfo[0]}*\n\n :brain:  ${userInfo[1]}`
+      				text: `:bust_in_silhouette:  *<@${dm_id}>*\n\n :mortar_board:  *${userInfo[0]}*\n\n :brain:  ${userInfo[1]}`
       			}
       		},
           {
@@ -625,7 +627,7 @@ app.view('dm_rusure', async({ ack, body, view, client }) => {
             type: "section",
             text: {
               type: "mrkdwn",
-              text: `*:postbox:  Message sent to ${dm_to_id}!!!*`
+              text: `*:postbox:  Message sent to <@${dm_to_id}>!!!*`
             }
           },
           {

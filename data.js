@@ -323,6 +323,12 @@ const getProfileById = async function(user_id){
   let user = await collectionUsers.findOne({slack_id:user_id});
 
   console.log(user_id)
+
+  // make sure user is in db
+  if(user == null){
+    return null;
+  }
+
   // get user graduating year:
   res.push(user.year);
 
@@ -368,6 +374,10 @@ const getAllProfile = async function(){
     // get user document
     let user = await collectionUsers.findOne({slack_id:u});
 
+    // make sure user is in db
+    if(user == null){
+      continue;
+    }
     // !!!!! TODO: change this
     // // push user_id
     // temp.push(u);

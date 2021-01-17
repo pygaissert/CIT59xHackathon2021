@@ -597,7 +597,7 @@ const showUserProfile = async function(user_id) {
             "fields": [
                 {
                     "title": ":bust_in_silhouette:  *Name*:",
-                    "value": `-\t  ${user_id}`,
+                    "value": `-\t  <@${user_id}>`,
                     "short": true
                 },
                 {
@@ -695,7 +695,7 @@ const showAllProfiles = async function() {
         // TODO
         // <@${user[0]}>
         // "text": `:bust_in_silhouette:  Name: *${user[0]}*\n\n :mortar_board:  Graduating Year: *${user[1]}*\n\n :brain:  Expertise: *${user[2]}*`
-        "text": `:bust_in_silhouette:  *${user[0]}*\n\n :mortar_board:  *${user[1]}*`
+        "text": `:bust_in_silhouette:  *<@${user[0]}>*\n\n :mortar_board:  *${user[1]}*`
 			},
 			"accessory": {
 				"type": "button",
