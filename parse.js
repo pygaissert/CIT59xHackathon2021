@@ -102,42 +102,21 @@ const capitalize = function(skill_input){
 // FUNCTION:
 // ARGUMENTS:
 const toKeepSkillList = function(old_skills, new_skills){
-  let keepList = [];
-  for (i of old_skills){
-    for (j of new_skills){
-      if (i === j){
-        keepList.push(i);
-      }
-    }
-  }
+  let keepList = old_skills.filter(x => new_skills.includes(x));
   return keepList;
 }
 
 // FUNCTION:
 // ARGUMENTS:
 const toDeleteSkillList = function(keep_skills, old_skills){
-  let deleteList = old_skills;
-  for (i = 0; i < old_skills.length; i++){
-    for (j = i; j < keep_skills.length; j++){
-      if(i === j){
-        deleteList.splice(old_skills[i], 1);
-      }
-    }
-  }
+  let deleteList = old_skills.filter(x => !keep_skills.includes(x));
   return deleteList;
 }
 
 // FUNCTION:
 // ARGUMENTS:
 const toAddSkillList = function(keep_skills, new_skills){
-  let addList = new_skills;
-  for (i = 0; i < new_skills.length; i++){
-    for (j = i; j < keep_skills.length; j++){
-      if(i === j){
-        addList.splice(new_skills[i], 1);
-      }
-    }
-  }
+  let addList = new_skills.filter(x => !keep_skills.includes(x));
   return addList;
 }
 

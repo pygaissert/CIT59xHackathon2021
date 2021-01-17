@@ -332,8 +332,6 @@ app.view('modal_addskill', async({ ack, view, response, body, say, client }) => 
 // ACTION: User clicks the button to edit profile
 // RESPONSE: Open modal view to allow user to edit profile
 app.action('button_edit', async({ ack, view, response, body, say, client }) => {
-  console.log(await data.userInfo(body.user.id));
-  console.log(await data.userSkill(body.user.id));
   await ack();
   try {
     // Open the modal for creating an EliCIT profile
@@ -370,16 +368,19 @@ app.view('modal-editProfile', async({ ack, view, body, say, client }) => {
       let old_skills = await data.userSkill(body.user.id);
       // Determine what skills to keep
       let toKeep = await parse.toKeepSkillList(old_skills, new_skills);
+      console.log(toKeep);
       // Determine what skills to delete
       let toDelete = await parse.toDeleteSkillList(toKeep, old_skills);
-      console.log(`Delete: ${toDelete}`);
+      console.log("Delete:");
+      console.log(toDelete);
       // Remove skill in toDelete array from "topics-users" database
       for (skill of toDelete){
-        await data.removeTopicFromUser(skill, body.user.id);
+        await data.removeTopicFromUser(skill,body.user.id);
       }
       // Determine what skills to add
       let toAdd = await parse.toAddSkillList(toKeep, new_skills);
-      console.log(`Add: ${toAdd}`);
+      console.log("Add");
+      console.log(toAdd);
       // Add skill in toAdd array to "topics-users" database
       for (skill of toAdd){
         await data.addTopicToUser(body.user.id, skill);

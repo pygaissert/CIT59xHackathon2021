@@ -343,6 +343,7 @@ const listUsers = async function() {
   let eachColl = await collection.find({}).forEach( function(item) {
     user_list.push(item.slack_id);
   });
+  await client.close();
   return user_list;
 }
 
@@ -350,19 +351,18 @@ const listUsers = async function() {
 // ARGUMENTS: topicName (String), userID ()
 const removeTopicFromUser = async function(topicName, userID) {
   let client = newClient();
-  try {
     await client.connect();
-    let connection = client.db("app-data").collection("topics-users");
+    let connection = await client.db("app-data").collection("topics-users");
     // Removes a document from "topics-users" with the matching topic and user
-    let deleteResult = await connection.deleteOne({ "topic": topicName, "user:": userID });
-    if (deleteResult.deletedCount === 1) {
-      console.log("Successfully deleted one document.");
-    } else {
-      console.log("No documents matched the query. Nothing was deleted.")
-    }
-  } finally {
+    // let result = await connection.findOne({})
+    let result = await connection.findOneAndDelete({ topic: topicName, user: userID });
+    console.log(`deleted: ${result.value.topic} (${result.value.user})`);
+    // if (deleteResult.deletedCount === 1) {
+    //   console.log("Successfully deleted one document.");
+    // } else {
+    //   console.log("No documents matched the query. Nothing was deleted.")
+    // }
     await client.close();
-  }
 }
 
 // FUNCTION: Returns an option_groups JSON of users grouped by topics
